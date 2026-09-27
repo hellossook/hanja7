@@ -1,0 +1,146 @@
+// S2 메인 맵 — 캔디맵 (2026-09-27 새 디자인): 사탕 배경 길 위에 설탕 코팅 과일 알 노드
+import { el, img, icon, go, registerScreen, stars, toast, pill, faceBadge, button, tile, uiIcon, menuBtn, petals } from '../core/ui.js';
+import { tune, tuneMode } from '../core/tune.js';
+import { progress, stageState } from '../core/store.js';
+import { STAGES, STAGE_ORDER, REVIEW_THRESHOLD, REVIEW_BONUS } from '../data/stages.js';
+import { box0Ids } from '../quiz.js';
+import { sfx, setSound } from '../core/audio.js';
+import { profileCard } from './title.js';
+import { save } from '../core/store.js';
+
+// 캔디맵 노드 좌표 (393x1180 맵 기준, bg_map_candy 길 위) + 과일 알
+// 노드 위치는 js/data/tuning.json 의 map.n1X~n6Y · gateX/Y (조정 모드 '맵'에서 끌어 옮긴다)
+const NODE_FRUIT = { '8': 'straw', '1-1': 'orange', '1-2': 'muscat', '1-3': 'blue', '1-4': 'kiwi', '1-5': 'grape' };
+// 스테이지별 자물쇠 색 (가게=분홍, 하늘과 땅=하늘, 꽃과 풀=연두, 사계절=주황, 하늘의 기운=보라, 종합=은, 2장 문=금)
+/** 과일 알 색 (node_*.png 에서 뽑음): 클리어·진행 중 노드의 손님 얼굴 테두리. 잠긴 노드는 회색 */
+const NODE_COLOR = { '8': '#F0363C', '1-1': '#F6A62C', '1-2': '#A8E752', '1-3': '#4249DB', '1-4': '#BCE243', '1-5': '#B851D4' };
+const LOCK_GRAY = '#B5B2AE';
+const NODE_LOCK = { '8': 'pink', '1-1': 'blue', '1-2': 'green', '1-3': 'orange', '1-4': 'purple', '1-5': 'silver' };
+let lastCam = null;   // 지난번 맵 화면 위치 (구간이 바뀌면 여기서부터 움직인다)
+const PAD = 200;   // 헤더에 가려지는 만큼 위쪽 여백 (맵 세로 = 1180 + PAD)
+const MAP = 'assets/ui/map/';
+function mapImg(name, cls) { return el('img', { src: MAP + name + '.png', alt: '', class: cls }); }
+
+function nodeState(id) {
+  const st = stageState(id);
+  if (st.cleared) return 'clear';
+  const idx = STAGE_ORDER.indexOf(id);
+  if (idx === 0) return 'open';
+  return stageState(STAGE_ORDER[idx - 1]).cleared ? 'open' : 'lock';
+}
+
+/** 복습 손님 다이얼로그 (v2) */
+export function reviewDialog(root, dueIds) {
+  const ov = el('div.overlay');
+  ov.append(el('div.scrim', { onClick: () => ov.remove() }));
+  const dlg = el('div.dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 110px)' } },
+    el('div.dtitle', { html: `복습하면 젤리 ${REVIEW_BONUS}개를<br>더 받을 수 있어요!` }),
+    el('div.dart', {}, img('char_owl_happy'), el('div.sparkle', { style: { left: '0', top: '40px' } }, icon.sparkle(24)), el('div.sparkle', { style: { right: '0', top: '20px', animationDelay: '300ms' } }, icon.sparkle(18))),
+    el('div.dbody', { html: `판다 손님이 잊어버린 글자 ${dueIds.length}개로<br>탕후루를 주문했어요.` }),
+    el('div.dbtn', {}, button('복습하기', '', () => go('game', { review: dueIds.slice(0, 5), bonus: true })), img('sticker_ribbon', { class: 'gift' })));
+  ov.append(dlg);
+  root.append(ov);
+  return ov;
+}
+
+registerScreen('map', (root, params = {}) => {
+  const scroll = el('div.map-scroll');
+  const world = el('div.map-world.candy');
+  world.append(el('img', { src: MAP + 'bg_map_candy.jpg', alt: '', class: 'bg', style: { position: 'absolute', left: 0, top: PAD + 'px', width: '393px', height: '1180px' } }));
+
+  let currentId = null;
+  STAGES.forEach((s, si) => {
+    const m = tune().map, k = si + 1;
+    const x = m['n' + k + 'X'], y0 = m['n' + k + 'Y'], y = y0 + PAD;   // 노드 위치 (맵 그림 기준) — 조정 모드 '맵'
+    const state = nodeState(s.id);
+    if (state === 'open' && !currentId) currentId = s.id;
+    const node = el('div.cnode.' + state, { 'data-tx': 'n' + k + 'X', 'data-ty': 'n' + k + 'Y', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: x + 'px', top: y + 'px' } });
+    node.append(mapImg(state === 'lock' ? 'node_lock' : 'node_' + NODE_FRUIT[s.id], 'ball'));
+    if (state === 'lock') node.append(mapImg('lock_' + NODE_LOCK[s.id], 'lockico'));
+    if (state === 'clear') {
+      const st = stageState(s.id).bestStars;
+      const row = el('div.cstars');
+      for (let i = 0; i < 3; i++) row.append(img(i < st ? 'star_on' : 'star_off', { class: 'st' }));   // 노란 별 (icon_star_full_2)
+      node.append(row);
+    }
+    node.append(el('div.clabel', { text: `${si + 1}. ${s.name}` }));   // "2. 하늘과 땅"
+    if (state === 'clear') node.append(el('div.cclear'));                // 클리어 리본
+    const face = el('div.cface', {}, faceBadge(s.customer, 34));         // 손님 얼굴 (테두리 = 스테이지 색)
+    face.style.setProperty('--ring', state === 'lock' ? LOCK_GRAY : NODE_COLOR[s.id]);
+    node.append(face);
+    node.addEventListener('click', () => {
+      if (state === 'lock') { node.classList.remove('shake'); void node.offsetWidth; node.classList.add('shake'); sfx.wrong(); toast('앞 가게를 먼저 열어요!'); return; }
+      sfx.tap();
+      go(s.learn ? 'learn' : 'game', { stageId: s.id });
+    });
+    world.append(node);
+  });
+  // 2장 — 구름 속 커튼 문
+  const tm = tune().map;
+  /** 2장 문 자물쇠: 위치·크기는 조정 모드 '맵' (gateLockX/Y/Size, 문 안 좌표) */
+  const gateLock = () => {
+    const l = mapImg('lock_pink', 'lockico gate-lock');
+    Object.assign(l.dataset, { tx: 'gateLockX', ty: 'gateLockY', tmode: 'plain' });
+    Object.assign(l.style, { left: tm.gateLockX + 'px', top: tm.gateLockY + 'px', width: tm.gateLockSize + 'px', height: Math.round(tm.gateLockSize * 1.15) + 'px' });
+    return l;
+  };
+  const ch2 = el('div.cnode.lock.gate', { 'data-tx': 'gateX', 'data-ty': 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } },
+    gateLock(), el('div.clabel', { text: '준비 중' }));   // 분홍 커튼 문 → 분홍 자물쇠
+  ch2.addEventListener('click', () => toast('챕터 2는 준비 중이에요'));
+  world.append(ch2);
+
+  const cur = currentId || STAGE_ORDER[STAGE_ORDER.length - 1];
+  const ci = STAGE_ORDER.indexOf(cur) + 1;
+
+  const dueIds = box0Ids();
+  if (dueIds.length >= REVIEW_THRESHOLD) {
+    const owl = el('div.owl-node', { style: { left: '292px', top: (560 + PAD) + 'px' } }, el('div.bub', { text: '복습하러 왔어요' }), img('char_owl', { class: 'float-y' }));
+    owl.addEventListener('click', () => { sfx.pop(); reviewDialog(root, dueIds); });
+    world.append(owl);
+  }
+  scroll.append(world);
+  root.append(scroll, petals(14));   // 벚꽃은 화면에 고정 (맵을 스크롤해도 계속 날린다)
+
+  const snd = menuBtn(icon.sound(progress.settings.sound, 44), '소리', () => {
+    setSound(!progress.settings.sound); save(); sfx.tap();
+    snd.querySelector('.ui-icon').classList.toggle('off', !progress.settings.sound);
+  });
+  const top = el('div.map-top', {},
+    el('div.map-head', {},
+      mapProfile(),
+      el('div.map-side', {},
+        pill(img('jelly'), progress.jelly),
+        el('div.map-tiles', {},
+          menuBtn(icon.book(44), '도감', () => { sfx.tap(); go('book'); }),
+          menuBtn(icon.sticker(44), '스티커', () => { sfx.tap(); go('stickers'); }),
+          snd))));
+  root.append(top);
+
+  /** 왼쪽 위 프로필: 위치·크기·이름·게이지를 조정 모드 '맵'에서 */
+  function mapProfile() {
+    const m = tune().map;
+    const card = profileCard(false, true);
+    card.style.height = m.profH + 'px';
+    const av = card.querySelector('.av'); Object.assign(av.style, { width: m.profAvatar + 'px', height: m.profAvatar + 'px' });
+    const name = card.querySelector('.name'); Object.assign(name.style, { fontSize: m.nameSize + 'px', transform: `translate(${m.nameX}px, ${m.nameY}px)` });
+    const bar = card.querySelector('.bar'); Object.assign(bar.style, { height: m.barH + 'px', transform: `translate(${m.barX}px, ${m.barY}px)` });
+    if (m.barW) Object.assign(bar.style, { width: m.barW + 'px', flex: 'none' });
+    return el('div.map-profile', { 'data-tx': 'profX', 'data-ty': 'profY', style: { left: m.profX + 'px', top: `calc(var(--safe-top) + ${m.profY}px)`, width: m.profW + 'px' } }, card);
+  }
+
+  // 손으로 스크롤하지 않는다. 진행에 따라 화면이 정해진다: 1~3번 → 맨 아래, 4~5번 → 3·4·5번, 6번(또는 다 깸) → 맨 위까지
+  const view = tuneMode && tm.camView ? tm.camView : (ci <= 3 ? 1 : ci <= 5 ? 2 : 3);
+  setTimeout(() => {
+    const max = Math.max(0, 1180 + PAD - scroll.clientHeight);
+    const to = Math.max(0, Math.min(max, tm['cam' + view + 'Y']));
+    const from = lastCam == null || tuneMode ? to : lastCam;   // 조정 모드에서는 바로 그 화면으로
+    lastCam = to;
+    scroll.scrollTop = from;
+    if (from !== to) {                                    // 다음 구간이 열렸으면 부드럽게 올라간다
+      const t0 = performance.now(), D = 1100;
+      const step = t => { const k = Math.min(1, (t - t0 - 350) / D); if (k > 0) scroll.scrollTop = from + (to - from) * (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2); if (k < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+    if (params.demoDialog) reviewDialog(root, dueIds.length ? dueIds : ['天', '地', '川', '海', '林']);
+  }, 0);
+});

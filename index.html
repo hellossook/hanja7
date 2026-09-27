@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#FFF6EC">
+  <meta name="apple-mobile-web-app-title" content="한자의 달인">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <title>7급 한자의 달인</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Jua&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ui-kit.css">
+</head>
+<body>
+  <div id="stage">
+    <div id="app"></div>
+  </div>
+  <div id="safe-probe"></div>
+  <script type="module" src="js/main.js"></script>
+  <script>
+    // PWA: 배포된 곳(아이폰 홈 화면 앱)에서만 서비스 워커를 켠다. 개발 미리보기(localhost)는 ?pwa=1 을 붙였을 때만
+    if ('serviceWorker' in navigator) {
+      const local = ['localhost', '127.0.0.1'].includes(location.hostname), q = new URLSearchParams(location.search);
+      if ((!local || q.has('pwa')) && !q.has('tune')) navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>

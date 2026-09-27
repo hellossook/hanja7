@@ -1,0 +1,659 @@
+/* ============================================================
+   UI 킷 적용 레이어 — style.css 다음에 로드한다.
+
+   [프레임을 입히는 방법 — 세 가지뿐]
+   1) 스킨 엔진(js/core/skin.js): 크기가 변하는 프레임(버튼·알약·카드·패널)과 색 변형이 필요한 것.
+      9조각을 캔버스에서 한 장으로 합성해 background-image 로 깐다 → 이음매·찌그러짐·줄무늬가 없다.
+      여기서는 테두리·그림자·배경색을 지우고 안쪽 여백만 잡아 준다.
+   2) 고정 비율 이미지: 원형·정사각 부품. background-size: 100% 100% (에셋을 정사각으로 패딩해 둠)
+   3) 반복 패턴: 바닥·체크 배경
+   border-image 와 컨테이너 filter 는 쓰지 않는다 (이음매가 보이고, 안에 든 그림까지 물든다).
+   ============================================================ */
+
+/* ---------- 글꼴: ONE 모바일POP (원스토어 무료 글꼴, assets/fonts/ 에 포함). 한자는 명조(--serif) 그대로 ---------- */
+@font-face { font-family: 'ONE Mobile POP'; src: url('../assets/fonts/ONEMobilePOP.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: block; }
+:root {
+  --jua: 'ONE Mobile POP', 'Jua', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --body: 'ONE Mobile POP', 'Gowun Dodum', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+}
+
+/* ---------- 0. 스킨 엔진이 그리는 요소 공통 ---------- */
+.btn, .pill, .profile, .profile .bar, .profile .bar i,
+.note, .splash-tip, .owl-node .bub, .dialog, .detail, .book-page, .book-page .head, .book-count,
+.cell-h, .wrong-chip, .chat-item .msg, .pink-panel, .tile, .node, .round-btn, .speech {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* style.css 의 상태 규칙이 되살리는 그림자·테두리를 다시 지운다 */
+.btn.yellow, .btn.mint, .btn.disabled, .btn:disabled, .round-btn.active, .tile.selected, .tile.dim, .tile.locked,
+.node.clear, .node.open, .node.lock, .cell-h.none, .note.mint { box-shadow: none; border: none; }
+
+/* ---------- 1. 버튼 ---------- */
+.btn { min-height: 68px; padding: 0 30px 8px; font-size: 27px; color: #fff; text-shadow: 0 2px 0 rgba(150,20,50,0.45); transition: transform 80ms, filter 80ms; }
+.btn:active { transform: translateY(3px) scale(0.985); filter: brightness(0.95); box-shadow: none; }
+.btn.yellow { color: #fff; text-shadow: 0 2px 0 rgba(170,85,0,0.5); }
+.btn.yellow:active, .btn.mint:active { box-shadow: none; }
+.btn.mint { text-shadow: 0 2px 0 rgba(20,110,85,0.45); }
+.btn.disabled, .btn:disabled { color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,0.2); opacity: 0.9; }
+.btn.small { min-height: 56px; padding: 0 26px 6px; font-size: 22px; }
+.btn img { width: 34px; height: 34px; }
+
+/* 원형 다음/이전 버튼 — 화살표가 에셋에 들어 있어 인라인 SVG 는 숨긴다 */
+.round-btn > svg, .close-btn > svg { display: none; }
+.round-btn.active:active { transform: translateY(3px); box-shadow: none; }
+.learn-arrow.l { left: 4px; } .learn-arrow.r { right: 4px; }
+.learn-arrow.l .round-btn, .book-nav.l .round-btn { transform: scaleX(-1); }
+.learn-arrow.l .round-btn.active:active, .book-nav.l .round-btn.active:active { transform: scaleX(-1) translateY(3px); }
+.close-btn, .back-btn {
+  background: url('../assets/ui/btn/btn_close_round.png') center / 100% 100% no-repeat;
+  border: none; border-radius: 0; box-shadow: none; padding: 0; cursor: pointer; flex: none;
+}
+.back-btn { background-image: url('../assets/ui/btn/btn_back_round.png'); transition: transform 80ms; }
+.close-btn:active, .back-btn:active { transform: translateY(3px); box-shadow: none; }
+
+/* 맵 상단 메뉴: 배경 없는 아이콘 + 라벨 (결정 #13) */
+.menu-btn { display: flex; flex-direction: column; align-items: center; gap: 1px; cursor: pointer; transition: transform 100ms; }
+.menu-btn:active { transform: scale(0.92); }
+.menu-btn .ui-icon { filter: drop-shadow(0 3px 0 rgba(90,62,43,0.18)); }
+.menu-btn .lbl { font-family: var(--jua); font-size: 13px; color: var(--ink); text-shadow: 0 2px 0 #fff; }
+.ui-icon.off { filter: grayscale(1); opacity: 0.45; }
+.ui-icon.flip { transform: scaleX(-1); }
+
+/* ---------- 2. 타일 (과일 슬롯) ---------- */
+.tile { transition: transform 120ms; }
+.tile.selected, .tile.dim, .tile.locked { box-shadow: none; background-color: transparent; }
+.tile .tile-in img { filter: none; }
+.tile .tag { border-color: #8B6A4F; box-shadow: 0 3px 0 rgba(90,62,43,0.2); }
+
+/* ---------- 3. 알약 카운터 (젤리 · 진행) ---------- */
+.pill { height: 36px; padding: 0 15px 2px 33px; font-size: 17px; }
+.pill .ico { left: -10px; top: -3px; width: 40px; height: 40px; background: none; border: none; border-radius: 0; }
+.pill .ico img, .pill .ico .ui-icon { width: 38px !important; height: 38px !important; filter: drop-shadow(0 2px 0 rgba(90,62,43,0.2)); }
+.pill.big { height: 44px; padding-left: 40px; font-size: 20px; }
+.pill.big .ico { width: 48px; height: 48px; }
+.pill.big .ico img { width: 46px !important; height: 46px !important; }
+
+/* ---------- 4. 미션 패널 (메모 카드 · 팁 배너 · 말풍선) ---------- */
+.note { padding: 20px 26px 22px; transform: none; }
+.note.mint { transform: none; background-color: transparent; }
+.note .tape { display: none; }                      /* 결정 #2 — 마스킹 테이프 제외 */
+.note .chip { background: #FFD84F; color: #7A5A12; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08); }
+.note.mint .chip { background: #fff; color: #1F9E7B; }
+.note .chip.retry { background: #FFD9E2; color: var(--pink2); }
+.splash-tip { padding: 20px 28px 22px; color: var(--ink); text-shadow: none; font-size: 18px; line-height: 1.35; word-break: keep-all; }
+.owl-node .bub { padding: 10px 14px 12px; font-size: 15px; }
+.game-note .note { width: 300px; height: 146px; }
+.sale-bubble .note { width: 230px; height: 96px; }
+.done-bubble .note { padding: 18px 22px 20px; }
+.order-toast .note { padding: 18px 22px 22px 26px; }
+
+/* ---------- 5. 흰 카드 (다이얼로그 · 상세 · 도감 페이지) ---------- */
+.dialog, .detail { padding: 36px 26px 30px; filter: drop-shadow(0 12px 18px rgba(90,62,43,0.28)); }
+.detail { padding-top: 30px; }
+.detail .close { right: -12px; top: -12px; }
+.book-page { padding: 44px 22px 26px 24px; filter: drop-shadow(0 8px 10px rgba(90,62,43,0.2)); }
+.book-page .rings { display: none; }
+.book-page .head { left: 50%; top: -20px; transform: translateX(-50%); height: 46px; padding: 0 30px 2px; color: #fff; text-shadow: 0 2px 0 rgba(170,40,100,0.35); white-space: nowrap; }
+.book-count { bottom: -16px; height: 36px; padding: 0 24px 2px; color: #fff; text-shadow: 0 2px 0 rgba(40,110,180,0.45); }
+.tab { border-color: #E6D8CC; }
+.tab.on { background: #FFD84F; border-color: #E9A700; }
+
+/* 한자 칸 · 오답 칩 — 상품 카드 프레임 (결정 #23) */
+.cell-h { height: 100px; padding-top: 12px; }
+.cell-h.none { background-color: transparent; }
+.cell-h .st { top: 9px; }
+.cell-h .dot { top: 8px; right: 8px; background: url('../assets/ui/icon/icon_notif_dot.png') center / contain no-repeat; border: none; width: 14px; height: 14px; border-radius: 0; }
+.wrong-chip { width: 74px; padding: 12px 0 10px; }
+
+/* ---------- 6. 프로필 ---------- */
+/* 카드: 아바타 · (이름 + 게이지). 위아래는 가운데 정렬, 좌우 안쪽 여백은 카드 테두리(흰 외곽선 + 갈색 선)만큼 띄운다 */
+.profile { height: 96px; padding: 0 26px 2px 17px; gap: 12px; align-items: center; }
+.profile.compact { height: 82px; padding: 0 18px 2px 15px; gap: 8px; }   /* 아바타 52px → 위·아래·왼쪽 여백이 모두 9px 안팎 */
+.profile .info { gap: 8px; justify-content: center; min-width: 0; }
+.profile.compact .info { gap: 9px; }
+.profile .name { font-size: 18px; line-height: 1; gap: 5px; justify-content: flex-start; }
+.profile.compact .name { font-size: 14.5px; gap: 3px; letter-spacing: -0.2px; }
+.map-profile { width: 208px; }
+.profile .name .ui-icon { flex: none; }
+.profile .bar { height: 16px; overflow: visible; width: 100%; }
+.profile.compact .bar { height: 14px; }
+.profile .bar i { min-width: 26px; }
+.profile.compact .bar i { min-width: 21px; }
+
+/* 아바타 프레임: 빨간 링 + 아래 라벨 바 (assets/ui/panel/panel_avatar_frame.png).
+   링 구멍 중심 (49.7%, 41.8%) · 반지름 30.1% · 라벨 바는 66%~99% — tools/build_ui.py build_avatar_frame 이 잰 값 */
+.profile .av { position: relative; flex: none; width: 70px; height: 70px; }
+.profile.compact .av { width: 60px; height: 60px; }
+.profile .av::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: url('../assets/ui/panel/panel_avatar_frame.png') center / 100% 100% no-repeat; }
+.profile .av .face-badge { position: absolute; left: 49.7%; top: 41.8%; width: 64% !important; height: 64% !important; transform: translate(-50%, -50%); background: #FFF6E7; border: none; }
+.profile .av .face-badge::after { display: none; }
+.profile .av .face-badge img { flex: none; width: 100% !important; height: 100% !important; margin: 0 !important; }
+.profile .av .day, .profile.compact .av .day { z-index: 2; left: 14%; right: 14%; top: 68%; bottom: 3%; height: auto; transform: none; padding: 0; border: none; border-radius: 0; background: none; box-shadow: none;
+  display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; line-height: 1; text-shadow: 0 1px 0 rgba(150,0,20,0.65); white-space: nowrap; }
+.profile.compact .av .day { font-size: 10px; }
+
+/* 원형 얼굴 배지 (채팅 · 스티커 탭 등) */
+/* 링 그림의 바깥 지름은 캔버스의 94%, 구멍은 74% → 링을 배지 끝까지 키우고(106.4%), 얼굴은 구멍(79%) 안에만 */
+.face-badge { position: relative; border: none; background: #fff; overflow: hidden; justify-content: center; align-items: center; }
+.face-badge::after { content: ''; position: absolute; inset: 0; background: url('../assets/ui/panel/panel_avatar_chat.png') center / 106.4% 106.4% no-repeat; pointer-events: none; }
+.face-badge > img { width: 79% !important; height: 79% !important; margin: 0 !important; border-radius: 50%; object-fit: cover; }
+
+/* ---------- 7. 채팅 말풍선 (꼬리가 왼쪽 아래) ---------- */
+.chat-list { gap: 6px; }
+.chat-item { gap: 8px; }
+.chat-item .msg { padding: 9px 18px 21px 20px; font-size: 16px; line-height: 1.2; min-height: 50px; margin-top: 8px; }
+.chat-bubble .face { border-color: #8B6A4F; }
+.chat-bubble .dot { right: -6px; top: -6px; width: 22px; height: 22px; border: none; border-radius: 0; background: url('../assets/ui/icon/icon_notif_dot.png') center / contain no-repeat; }
+
+/* ---------- 8. 리본 (아치라서 늘리지 않는다: 1263×339 = 3.73:1) ---------- */
+.ribbon svg { display: none; }
+.ribbon { background: url('../assets/ui/panel/panel_ribbon_pink.png') center / contain no-repeat; width: 356px; height: 96px; margin-left: -26px; }
+.ribbon.blue { background-image: url('../assets/ui/panel/panel_ribbon.png'); }
+.ribbon span { top: 20px; }
+.result-ribbon { z-index: 3; top: calc(var(--safe-top) + 22px); }
+
+/* ---------- 9. 하단 시트 · 탭 · 스티커 칸 ---------- */
+.pink-panel { padding: 24px 18px 0; }
+.tab-square { background: url('../assets/ui/btn/btn_tab_off.png') center / 100% 100% no-repeat; border: none; border-radius: 0; width: 58px; height: 58px; }
+.tab-square.on { background: url('../assets/ui/btn/btn_tab_on.png') center / 100% 100% no-repeat; border: none; }
+.tchip .box { background: url('../assets/ui/panel/panel_item_cell.png') center / 100% 100% no-repeat; border: none; border-radius: 0; box-shadow: none; }
+.tchip.free .box { box-shadow: none; filter: drop-shadow(0 5px 6px rgba(255,111,142,0.3)); }
+.tchip.none .box { border: none; }
+.tchip.empty .box { background: transparent; border: 3px dashed #F7A9C0; border-radius: 20px; }
+.tchip .s .ui-icon { display: inline-block !important; vertical-align: -2px; }
+
+/* ---------- 10. 출석 노트 (장식이 모서리에 있어 늘리지 않는다) ---------- */
+.notebook { background: url('../assets/ui/panel/panel_notebook.png') center / contain no-repeat; border: none; box-shadow: none; border-radius: 0; padding: 44px 34px 38px 52px; }
+.notebook .rings, .notebook .ntabs { display: none; }
+.notebook .paper { background: none; border: none; }
+.notebook .box { background: url('../assets/ui/btn/btn_radio_off.png') center / 100% 100% no-repeat; border: none; }
+.notebook .box.on { background: url('../assets/ui/btn/btn_radio_on.png') center / 100% 100% no-repeat; border: none; }
+.notebook .box > svg { visibility: hidden; }
+
+/* ---------- 11. 맵 ---------- */
+.node { width: 88px; height: 88px; margin: -44px 0 0 -44px; }
+.node.clear, .node.lock { background-color: transparent; box-shadow: none; }
+.node.open { background-color: transparent; animation: node-pulse 1400ms ease-in-out infinite; }
+@keyframes node-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.node.open .go { color: #7A4A00; font-size: 23px; text-shadow: 0 2px 0 rgba(255,255,255,0.6); margin-top: -4px; }
+.node .stars { margin-top: -4px; }
+.node .ui-icon { margin-top: -4px; }
+.map-marker { width: 60px; height: 72px; margin-left: -30px; filter: drop-shadow(0 4px 3px rgba(90,62,43,0.25)); }
+.map-tiles { gap: 12px; padding-right: 2px; }
+.map-side { gap: 8px; }
+
+/* ---------- 12. 코팅 냄비 고르기 (시럽 냄비 그림 3종: assets/ui/cook/jar_*.png) ---------- */
+.jar .pot { width: 112px; height: 112px; display: flex; align-items: center; justify-content: center; background: none; }
+.jar .pot img { width: 100%; filter: drop-shadow(0 4px 0 rgba(90,62,43,0.2)); }
+.jar.small .pot { width: 90px; height: 90px; }
+.jar.small .pot img { width: 100%; }
+.jar.locked .pot { filter: grayscale(1); opacity: 0.55; }
+.jar.locked img { opacity: 1; }
+.jars { gap: 12px; }
+.stir-arrows { display: flex; justify-content: space-between; align-items: center; margin-left: -40px; width: 230px !important; }
+.stir-arrows .sa { display: block; animation: bounce 600ms ease-in-out infinite alternate; }
+.stir-arrows .sa.l { animation-delay: -300ms; }   /* 왼쪽·오른쪽이 번갈아 */
+
+/* ---------- 13. 결과 화면의 탕후루 (액자 없음) ---------- */
+.result-photo { overflow: visible; border: none; border-radius: 0; box-shadow: none; background: none; left: 50px; width: 293px; }
+
+/* 노란 배경 위의 노란 별이 묻히지 않게 */
+.result-stars img { filter: drop-shadow(0 3px 0 rgba(150,80,10,0.25)); }   /* 새 별은 갈색 외곽선이 있어 따로 테두리를 안 준다 */
+.done-bubble.result { bottom: calc(var(--safe-bottom) + 136px); }
+.done-bubble.result .note { padding: 14px 22px 16px; }
+.sale-note { margin-top: 36px; }
+.jars { top: calc(var(--safe-top) + 98px); }
+
+/* ---------- 14. 작은 부품 ---------- */
+.learn-card .words, .detail .words {
+  border-top: none; background-color: transparent;
+  background-image: url('../assets/ui/panel/panel_divider_dash.png'); background-repeat: repeat-x; background-position: top center; background-size: auto 10px;
+  padding-top: 22px;
+}
+.learn-card { padding: 0; }
+.learn-card .front { padding: 30px 0 14px; }
+.learn-card .words { width: calc(100% - 36px); margin: 0 18px; padding: 22px 8px 26px; border-radius: 0; }
+.learn-dots { gap: 6px; }
+.learn-dots i { width: 20px; height: 20px; border: none; border-radius: 0; background: url('../assets/ui/btn/btn_radio_off.png') center / 100% 100% no-repeat; }
+.learn-dots i.on { background: url('../assets/ui/btn/btn_radio_on.png') center / 100% 100% no-repeat; }
+.game-body .dots { gap: 8px; right: 40px; }
+.game-body .dots i { width: 20px; height: 20px; border: none; border-radius: 0; background: url('../assets/ui/icon/icon_dropzone.png') center / 100% 100% no-repeat; }
+.game-body .dots i.on { background: url('../assets/ui/icon/icon_step_done.png') center / 100% 100% no-repeat; }
+.skewer .target { border: none; border-radius: 0; background: url('../assets/ui/icon/icon_dropzone.png') center / 100% 100% no-repeat; opacity: 0.95; }
+
+/* ---------- 15. 배경 · 패턴 ---------- */
+.plaid   { background: url('../assets/ui/ptn/ptn_dash_grid.png') 0 0 / 120px 120px repeat, #FFF3DC; }
+/* 장면 배경 (원본: assets/ui/_src/bg_*_src.png → python3 tools/build_ui.py). 무늬가 이미지에 있으니 점선 SVG 는 숨긴다 */
+.bg-layer.result { background: url('../assets/ui/bg/bg_result.jpg') center top / cover no-repeat, #FFEFC4; }                    /* 스테이지 결과 */
+.bg-layer.yellow { background: url('../assets/ui/bg/bg_coating.jpg') center top / 100% auto repeat-y, #FFEFD6; }               /* 코팅 고르기 · 저어주기 (다이아 무늬, 세로 반복) */
+.bg-layer.done   { background: url('../assets/ui/bg/bg_done.jpg') center top / cover no-repeat, #D8ECFF; }                        /* 탕후루 완성 */
+.bg-layer.sale   { background: url('../assets/ui/bg/bg_sale.jpg') center bottom / cover no-repeat, #FFE3D3; }                     /* 손님이 먹는 장면 */
+.bg-layer.yellow > svg, .bg-layer.result > svg, .bg-layer.done > svg, .bg-layer.sale > svg { display: none !important; }   /* SVG 에 인라인 display 가 있어서 !important */
+
+/* ---------- 16. 메인 맵 — 노점 거리 (에셋: assets/ui/map/, 빌드: python3 tools/build_map.py) ---------- */
+.map-world.stall-street { background: url('../assets/ui/map/ground.png') center top / 100% auto repeat; }
+.map-top { background: linear-gradient(180deg, rgba(255,232,214,0.97) 72%, rgba(255,232,214,0)); padding-bottom: 22px; }
+.map-deco { position: absolute; pointer-events: none; opacity: 0.95; }
+.map-deco svg { display: block; filter: drop-shadow(0 1px 0 rgba(150,90,60,0.18)); }
+.map-road { position: absolute; display: block; pointer-events: none; }
+.stall { position: absolute; cursor: pointer; transition: transform 120ms; z-index: 2; }
+.stall:active { transform: scale(0.96); }
+.stall .body { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; filter: drop-shadow(0 4px 3px rgba(120,70,40,0.22)); }
+.stall .win { position: absolute; display: block; }
+.stall.open { animation: node-pulse 1500ms ease-in-out infinite; }
+.stall-stars { position: absolute; left: 0; right: 0; top: -22px; display: flex; justify-content: center; }
+.stall-stars .stars { gap: 1px; }
+.stall-stars img { filter: drop-shadow(0 2px 0 rgba(120,70,40,0.22)); }
+.stall-face { position: absolute; right: -32px; top: -6px; filter: drop-shadow(0 2px 2px rgba(120,70,40,0.18)); }
+/* 시안의 손님 말풍선: 회색 링 대신 반투명 흰 동그라미 */
+.stall-face .face-badge { background: rgba(255,255,255,0.72); box-shadow: 0 0 0 2px rgba(255,255,255,0.9); }
+.stall-face .face-badge::after { display: none; }
+.stall-face .face-badge img { flex: none; width: 92% !important; height: 92% !important; margin: 4% 0 0 !important; }
+.stall-name { position: absolute; display: flex; align-items: center; justify-content: center; font-family: var(--jua); color: #fff; text-shadow: 0 1px 0 rgba(140,60,20,0.8), 0 0 3px rgba(140,60,20,0.55); white-space: nowrap; line-height: 1; }
+.stall-name span { font-size: 13px; letter-spacing: -0.4px; }
+.stall.lock .stall-name { text-shadow: 0 1px 0 rgba(120,60,30,0.8), 0 0 3px rgba(120,60,30,0.55); }
+.map-marker { z-index: 3; width: 56px; height: 66px; margin-left: -28px; }
+.owl-node { z-index: 3; }
+.owl-node img { width: 84px; }
+
+/* ---------- 17. 스플래시 일러스트 ---------- */
+.splash-art { position: absolute; inset: 0; z-index: -1; background: url('../assets/ui/bg/bg_splash.jpg') center top / cover no-repeat, #9AD8FF; }
+
+/* ---------- 18. 캐릭터 (assets/chars/) ---------- */
+.face-badge img, .chat-bubble .face img, .cust-sticker .face img { display: block; object-fit: contain; flex: none; }
+.face-badge { align-items: center; }
+.chat-bubble .face { align-items: center; }
+.sale-customer img { width: 210px; }
+.owl-node img { width: 92px; }
+
+/* ---------- 19. 꼬치 · 코팅 · 조리 냄비 (assets/fruits/, assets/ui/cook/ — tools/build_fruits.py) ---------- */
+.skewer .tip { display: none; }
+.skewer .stick { top: 0; width: 15px; margin-left: -7.5px; border: none; border-radius: 0; background-color: transparent; box-shadow: none; }
+.skewer img.coat { position: absolute; left: 50%; display: block; background: none; border-radius: 0; box-shadow: none; pointer-events: none; }
+.cook-pot { position: relative; filter: drop-shadow(0 6px 6px rgba(90,62,43,0.18)); }
+.cook-pot img { width: 100%; display: block; }
+.cook-pot img.syrup { position: absolute; left: 0; top: 0; }
+
+/* ---------- 20. 조정 가능한 꼬치 (위치·크기·기울기는 js/data/tuning.json) ---------- */
+.tuned-skewer { position: absolute; width: 0; }   /* 겹침 순서는 화면에 붙는 순서대로 (냄비 위, 알림 아래) */
+.tuned-skewer > .inner { width: 0; }
+.result-skewer { z-index: 4; }
+
+/* ---------- 21. 손님 말풍선 (panel_chat_bubble_2.png) · 주문 딤 · 끌어서 꽂기 · 판매 멘트 · 클리어 배지 ---------- */
+.speech { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; padding: 14px 22px 34px 22px; }
+.speech .line { font-family: var(--jua); color: var(--ink); word-break: keep-all; }
+.speech .chip { border-radius: 999px; padding: 3px 12px; font-family: var(--jua); font-size: 15px; background: #FFD84F; color: #7A5A12; }
+.order-toast .speech { flex: 1; margin-bottom: 40px; min-height: 118px; }
+.order-toast .speech .line { font-size: 21px; line-height: 1.3; }
+.order-toast > img { filter: none; }
+.order-dim { position: absolute; inset: 0; z-index: 25; background: rgba(40, 24, 14, 0.36); animation: dim-in 220ms ease-out both; }
+.order-dim.out { animation: dim-out 240ms ease-in forwards; }
+@keyframes dim-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dim-out { to { opacity: 0; } }
+.sale-bubble .speech { width: 220px; height: 108px; align-items: center; padding: 10px 18px 30px; }
+.sale-bubble .speech .line { font-size: 28px; }
+.sale-note.fade-out { transition: opacity 300ms ease; opacity: 0; }
+.done-bubble.plain { pointer-events: none; }
+.done-bubble.plain .done-text { font-family: var(--jua); font-size: 21px; line-height: 1.35; color: var(--ink); text-align: center; word-break: keep-all;
+  text-shadow: 0 2px 0 #fff, 0 0 6px #fff, 0 0 12px rgba(255,255,255,0.9); }
+.chat-list { gap: 4px; }
+.chat-item .msg { margin-top: 10px; }
+.drag-fruit { position: absolute; z-index: 40; pointer-events: none; transform: scale(1.12); }
+.drag-fruit img { width: 100%; height: 100%; display: block; object-fit: contain; }
+.skewer .target { transition: transform 120ms; }
+.skewer.drop-ok .target { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(255,255,255,0.95)); }
+.tile.nudge { animation: nudge 360ms ease-in-out; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(8px); } 60% { transform: translateX(-4px); } }
+.tap-guide.drag { animation: drag-hint 1900ms ease-in-out infinite; }
+@keyframes drag-hint { 0% { transform: translate(0, 0); opacity: 0; } 12% { opacity: 1; transform: translate(0, 0) scale(0.92); } 72% { transform: translate(var(--dx), var(--dy)) scale(0.92); opacity: 1; } 88%, 100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+.stall-clear { position: absolute; left: -6px; top: 42%; z-index: 2; transform: rotate(-14deg); padding: 3px 9px 4px; border-radius: 999px; border: 2px solid #fff;
+  background: linear-gradient(180deg, #7FE6C8, #2FB893); color: #fff; font-family: var(--jua); font-size: 12px; line-height: 1; letter-spacing: 0.5px;
+  text-shadow: 0 1px 0 rgba(0, 90, 60, 0.5); box-shadow: 0 2px 0 rgba(20, 110, 85, 0.45); pointer-events: none; }
+
+/* ---------- 22. 말풍선 꼬리 · 결과 멘트 · 젤리 비 · 도감 스크롤 · 스티커 ---------- */
+/* 말풍선 꼬리는 하나만: --tail-x = 말풍선 왼쪽에서 꼬리 끝까지 (기본 = 원래 그림 자리) */
+.speech::after { content: ''; position: absolute; bottom: 0; left: calc(var(--tail-x, 74.7px) - 7px); width: 27.3px; height: 33.3px;
+  background: url('../assets/ui/panel/panel_chat_bubble_2_tail.png') 0 0 / 100% 100% no-repeat; pointer-events: none; }
+.sale-bubble .speech { --tail-x: 142px; }            /* 판매: 예전 세 번째 꼬리 자리 */
+.order-toast .speech { --tail-x: 74.7px; }           /* 주문: 첫 번째 자리 그대로 */
+.sale-note-wrap { position: absolute; left: 0; right: 0; top: 50%; margin-top: -20px; display: flex; justify-content: center; z-index: 27; pointer-events: none; }
+.sale-note-wrap .sale-note { position: static; transform: none; margin: 0; }
+.sale-note-wrap.fade-out { transition: opacity 300ms ease; opacity: 0; }
+.done-bubble.result.plain { bottom: calc(var(--safe-bottom) + 138px); }
+.done-bubble.result.plain .done-text { font-size: 25px; }
+.rain { animation: jelly-fall 1600ms cubic-bezier(.45,.05,.8,.6) both; }
+@keyframes jelly-fall { 0% { opacity: 0; transform: translateY(0) rotate(-12deg); } 8% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateY(1000px) rotate(24deg); } }
+.book-scroll { margin-right: -16px; padding-right: 16px; }   /* 스크롤바를 한자 칸에서 떼어 오른쪽 여백으로 */
+.cust-sticker { border: none !important; border-radius: 0; background: none; overflow: visible; box-shadow: none;
+  filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff) drop-shadow(0 3px 3px rgba(90,62,43,0.22)); }
+.wall-sticker { filter: none; }
+.stickers-screen .wall-box { background: url('../assets/ui/bg/bg_sale.jpg') center bottom / cover no-repeat, #FFE3D3; }
+.stickers-screen .wall-box .hint { top: 40%; color: var(--ink); opacity: 0.8; text-shadow: 0 2px 0 #fff; }
+/* 11. 프로필 사장님 얼굴 확대 */
+.profile .av .face-badge > img { width: 142% !important; height: 142% !important; transform: translateY(6%); }
+
+/* ---------- 23. 2026-09-26 요청 반영 ---------- */
+/* 손님 프로필: 빨간 프로필 프레임 (사장님 프로필과 같은 그림) — 얼굴 구멍 중심 (49.7%, 41.8%) · 지름 64% · 아래 띠 68%~97% */
+.frame-badge { position: relative; flex: none; }
+.frame-badge::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: url('../assets/ui/panel/panel_avatar_frame.png') center / 100% 100% no-repeat; }
+.frame-badge .fb-face { position: absolute; left: 49.7%; top: 41.8%; width: 64%; height: 64%; transform: translate(-50%, -50%); border-radius: 50%; overflow: hidden; background: #FFF6E7; }
+.frame-badge .fb-face img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.frame-badge .fb-label { position: absolute; z-index: 2; left: 14%; right: 14%; top: 68%; bottom: 3%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--jua); color: #fff; line-height: 1; white-space: nowrap; text-shadow: 0 1px 0 rgba(150,0,20,0.65); }
+.game-avatar { position: absolute; z-index: 6; }
+.game-top { display: none; }
+.pills { left: auto; }
+.chat-item .frame-badge { margin-top: 2px; }
+/* 주문: 말풍선(위) + 손님(아래)을 화면 한가운데, 손님 2배 */
+.order-toast { left: 0; right: 0; top: 0; bottom: 0; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+.order-toast > img { width: 264px; animation: none; }
+.order-toast .speech { flex: none; width: 300px; min-height: 120px; margin: 0 0 -6px; --tail-x: 50%; align-items: center; text-align: center; }
+.order-toast .speech .line { text-align: center; }
+/* 과일 꽂기: 꼬치 끝에 대고 아래로 */
+.drag-fruit.threaded { transform: none; }
+/* 문제 화면 오른쪽 진행 표시 1.5배 */
+.game-body .dots { gap: 12px; right: 30px; }
+.game-body .dots i { width: 30px; height: 30px; }
+/* 결과: 오답 카드 문구 · 별과 젤리 오른쪽 정렬 · 제목 외곽선 */
+.wrong-label { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--jua); font-size: 14px; color: var(--ink2); }
+.result-photo .counter { align-items: flex-end; text-align: right; }
+.result-ribbon .ribbon span { text-shadow: none; -webkit-text-stroke: 7px #D6457A; paint-order: stroke fill; }
+/* 맵: 오른쪽 스크롤 막대 숨김 */
+.map-scroll { scrollbar-width: none; }
+.map-scroll::-webkit-scrollbar { display: none; }
+/* 결과: 판매 완료 멘트는 한 줄로 (오답 카드 문구와 버튼 사이) */
+.done-bubble.result.plain { left: 10px; right: 10px; bottom: calc(var(--safe-bottom) + 138px); }
+.done-bubble.result.plain .done-text { font-size: 24px; white-space: nowrap; letter-spacing: -0.3px; }
+
+/* ---------- 24. 얼굴 배지 링 (2026-09-26 새 그림) · 진행 표시 크기 변수 ---------- */
+/* panel_avatar_chat: 바깥 96.4% · 구멍 78.2% → 링을 배지 끝까지(103.7%), 얼굴은 구멍(81%) 안 */
+.face-badge::after { background-size: 103.7% 103.7%; }
+.face-badge > img { width: 80% !important; height: 80% !important; }
+/* panel_avatar_profile: 바깥 95.7% · 구멍 73.7% → 104.5%, 얼굴 76% */
+.face-badge.ring-profile::after { background-image: url('../assets/ui/panel/panel_avatar_profile.png'); background-size: 104.5% 104.5%; }
+.face-badge.ring-profile > img { width: 76% !important; height: 76% !important; }
+.game-body .dots i { width: var(--dot, 30px); height: var(--dot, 30px); }
+.game-note .note { max-width: none; }
+
+/* ---------- 25. 수량 박스 가로 · 한자 글자 위치 ---------- */
+.pills { flex-direction: row; align-items: center; gap: 12px; }
+.opts .tile .tag { transform: translate(var(--tag-x, 0px), var(--tag-y, 0px)) rotate(6deg) scale(var(--tag-s, 1)); transform-origin: 100% 0; }
+
+/* ---------- 26. 결과 화면 글자 배치 (조정 모드 '결과') ---------- */
+.r-place { position: absolute; width: 0; display: flex; justify-content: center; z-index: 3; }
+.r-place > * { position: static !important; flex: none; white-space: nowrap; }
+.r-place .result-ribbon .ribbon { margin-left: 0; }
+.r-place .result-wrong, .r-place .result-stars { left: auto; right: auto; }
+.result-done .done-text { font-family: var(--jua); line-height: 1.35; color: var(--ink); text-align: center; text-shadow: 0 2px 0 #fff, 0 0 6px #fff, 0 0 12px rgba(255,255,255,0.9); }
+
+/* ---------- 27. 맵: 클리어 리본 (assets/ui/map/badge_clear.png) ---------- */
+.stall-clear { left: 50%; top: 36%; width: 118px; height: 40px; padding: 0; border: none; border-radius: 0; box-shadow: none; transform: translateX(-50%) rotate(-8deg);
+  background: url('../assets/ui/map/badge_clear.png') center / contain no-repeat; color: transparent; text-shadow: none; font-size: 0; }
+
+/* ---------- 28. 벚꽃 · 스플래시 버튼 · 맵 리본/이름/프로필 ---------- */
+.petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 8; }
+.petal { position: absolute; top: -30px; animation: petal-fall linear infinite; }
+.petal-in { width: 100%; height: 100%; animation: petal-sway ease-in-out infinite alternate; }
+@keyframes petal-fall { from { transform: translateY(0); } to { transform: translateY(1060px); } }
+@keyframes petal-sway { from { transform: translateX(-18px) rotate(-35deg); } to { transform: translateX(18px) rotate(40deg); } }
+.title-cta.boing { animation: boing 1300ms ease-in-out infinite; z-index: 9; }
+@keyframes boing { 0%, 55%, 100% { transform: translateY(0) scale(1, 1); } 12% { transform: translateY(-14px) scale(0.98, 1.03); } 24% { transform: translateY(0) scale(1.04, 0.95); } 34% { transform: translateY(-6px) scale(1, 1.01); } 44% { transform: translateY(0) scale(1.01, 0.99); } }
+.stall-clear { left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg);
+  filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 2px rgba(90, 45, 10, 0.3)); }
+.stall-name { text-shadow: none; }
+.stall-name span { -webkit-text-stroke: 3px #A5522A; paint-order: stroke fill; text-shadow: none; }
+.stall.lock .stall-name span { -webkit-text-stroke-color: #7A5A48; }
+.map-head { position: relative; }
+.map-profile { position: absolute; margin: 0; }
+.map-side { margin-left: auto; }
+.learn-cta.boing { animation: boing 1300ms ease-in-out infinite; position: relative; z-index: 3; }
+
+/* ---------- 29. 맵: 가게 색 얼굴 테두리 · 메뉴 간격 · 리본/별 위치 ---------- */
+.stall-face .face-badge { background: #fff; box-shadow: 0 0 0 3px var(--ring, #fff), 0 0 0 5px #fff; }
+.stall.lock .stall-face .face-badge { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring, #ccc) 55%, #b9aea6), 0 0 0 5px #fff; }
+.map-tiles { gap: 3px; padding-right: 0; }
+.map-tiles .menu-btn { width: 50px; }
+.stall-clear { transform: translate(calc(-50% + 10px), -50%) rotate(-8deg); }
+.stall-stars { top: -13px; }
+
+/* ---------- 30. 캔디맵 (2026-09-27 다른 세션에서 만든 새 맵 — 노드는 설탕 코팅 과일 알) ---------- */
+/* 배경 bg_map_candy.jpg 393x1180. 노드 = 설탕 코팅 과일 알(assets/ui/map/) */
+.map-world { height: 1380px; background: #CFCDFC; }
+.map-legend { display: none; }                                   /* 캔디맵은 범례 불필요 */
+.cnode { position: absolute; width: 66px; height: 66px; margin: -33px 0 0 -33px; cursor: pointer; transition: transform 120ms; }
+.cnode:active { transform: scale(0.94); }
+.cnode .ball { position: absolute; inset: 0; width: 66px; height: 66px; display: block; filter: drop-shadow(0 4px 3px rgba(90,62,43,0.25)); }
+.cnode.open .ball { animation: cnode-glow 1400ms ease-in-out infinite; }
+@keyframes cnode-glow { 0%,100% { filter: drop-shadow(0 0 4px #FFE27A) drop-shadow(0 4px 3px rgba(90,62,43,0.25)); } 50% { filter: drop-shadow(0 0 14px #FFD84F) drop-shadow(0 4px 3px rgba(90,62,43,0.25)); } }
+.cnode .lockico { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 30px; height: 34px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.cnode.gate { width: 66px; height: 66px; }                     /* 커튼 문은 배경에 그려져 있고 자물쇠만 올림 */
+.cnode.gate .lockico { width: 40px; height: 46px; animation: float-y 1800ms ease-in-out infinite; }
+/* 별 3개 (클리어) */
+.cnode .cstars { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); display: flex; gap: 0; align-items: flex-end; }
+.cnode .cstars .st { width: 20px; height: 20px; display: block; }
+.cnode .cstars .st:nth-child(2) { width: 24px; height: 24px; margin: 0 -2px 3px; }
+.cnode .cstars .st.off { filter: saturate(0) brightness(1.12) opacity(.55); }
+/* 라벨 — 킷 label pill 위에 스테이지명 */
+.cnode .clabel {
+  position: absolute; left: 50%; top: 66px; transform: translateX(-50%);
+  white-space: nowrap; height: 26px; line-height: 26px; padding: 0 12px;
+  font-family: var(--jua); font-size: 13px; color: var(--ink); isolation: isolate; background-repeat: no-repeat;   /* 라벨 그림은 스킨 엔진(skin.js 'clabel') */
+}
+.cnode .clabel small { font-size: 11px; color: var(--ink2); font-family: var(--body); margin-right: 3px; }
+.cnode.lock .clabel { color: #7E6A5C; } .cnode.lock .clabel small { color: #9E8E82; }
+.cnode.gate .clabel { top: 62px; }
+/* 현재 스테이지 위 캐릭터 카드 */
+.ccard { position: absolute; width: 72px; height: 72px; margin-left: -36px; margin-top: -72px; pointer-events: none; animation: float-y 1600ms ease-in-out infinite; }
+.ccard .frame { position: absolute; inset: 0; width: 72px; height: 72px; display: block; }
+.ccard .face { position: absolute; left: 14px; top: 8px; width: 44px; height: 50px; object-fit: contain; object-position: bottom; }
+
+/* 캔디맵에 맞춘 헤더 · 벚꽃 */
+.map-world.candy { background: #CFCDFC; }
+
+/* 캔디맵: 손님 얼굴(스테이지 색 테두리) · 클리어 리본 */
+.cnode .cface { position: absolute; right: -40px; top: -12px; z-index: 2; pointer-events: none; filter: drop-shadow(0 2px 2px rgba(120,70,40,0.18)); }
+.cnode .cface .face-badge { background: #fff; box-shadow: 0 0 0 3px var(--ring, #fff), 0 0 0 5px #fff; }
+.cnode .cface .face-badge::after { display: none; }
+.cnode .cface .face-badge > img { width: 92% !important; height: 92% !important; margin-top: 4% !important; border-radius: 0; }
+.cnode.lock .cface .face-badge { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring, #ccc) 55%, #b9aea6), 0 0 0 5px #fff; }
+.cnode .cclear { position: absolute; left: 50%; top: 56%; width: 96px; height: 32px; z-index: 3; pointer-events: none; transform: translate(calc(-50% + 10px), -50%) rotate(-8deg);
+  background: url('../assets/ui/map/badge_clear.png') center / contain no-repeat;
+  filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 2px rgba(90, 45, 10, 0.3)); }
+
+/* 캔디맵 2026-09-27: 잠김 회색 · 노란 별 · 진행 중 통통 */
+.cnode .lockico { filter: grayscale(1) brightness(1.06) contrast(0.95) drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+.cnode.lock .clabel { color: #8E8A86; }
+.cnode .clabel { padding: 0 14px 1px; }
+.cnode .cstars { top: -34px; }
+.cnode .cstars .st { width: 22px !important; height: 22px !important; filter: drop-shadow(0 2px 0 rgba(120,70,40,0.22)); }
+.cnode .cstars .st:nth-child(2) { width: 26px !important; height: 26px !important; margin: 0 -1px 4px; }
+.cnode.open .ball { animation: node-boing 1100ms ease-in-out infinite, cnode-glow 1400ms ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes node-boing { 0%, 60%, 100% { transform: scale(1, 1); } 12% { transform: scale(1.12, 0.9); } 24% { transform: scale(0.94, 1.12) translateY(-6px); } 36% { transform: scale(1.06, 0.96); } 48% { transform: scale(0.99, 1.02); } }
+
+/* 캔디맵: 과일 알 1.2배 (66 → 80) · 얼굴 작게 · 2장 문 자물쇠 분홍 */
+.cnode { width: 80px; height: 80px; margin: -40px 0 0 -40px; }
+.cnode .ball { width: 80px; height: 80px; }
+.cnode .lockico { width: 36px; height: 41px; }
+.cnode .clabel { top: 80px; }
+.cnode .cstars { top: -30px; }
+.cnode .cface { right: -34px; top: -10px; }
+.cnode .cclear { width: 110px; height: 37px; }
+.cnode.gate { width: 66px; height: 66px; margin: -33px 0 0 -33px; }
+.cnode.gate .clabel { top: 62px; }
+.cnode.gate .lockico.gate-lock { filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); animation: none; pointer-events: auto; }
+
+/* ---------- 31. 얼굴 마스크 = 프로필 프레임 구멍 모양 (build_ui.py build_face_masks) ---------- */
+/* 채팅 링(panel_avatar_chat): 링은 배지의 103.7% 로 그린다 → 얼굴 86% 에 같은 그림의 구멍을 120.6% 로 씌운다 */
+.face-badge > img { border-radius: 0 !important; width: 86% !important; height: 86% !important; object-fit: cover;
+  -webkit-mask: url('../assets/ui/panel/mask_panel_avatar_chat.png') center / 120.6% 120.6% no-repeat; mask: url('../assets/ui/panel/mask_panel_avatar_chat.png') center / 120.6% 120.6% no-repeat; }
+/* 프로필 링(panel_avatar_profile): 링 104.5% → 얼굴 82%, 구멍 127.4% */
+.face-badge.ring-profile > img { width: 82% !important; height: 82% !important;
+  -webkit-mask-image: url('../assets/ui/panel/mask_panel_avatar_profile.png'); mask-image: url('../assets/ui/panel/mask_panel_avatar_profile.png');
+  -webkit-mask-size: 127.4% 127.4%; mask-size: 127.4% 127.4%; }
+/* 사장님 프로필(빨간 프레임 panel_avatar_frame): 얼굴 칸을 프레임 전체 크기로 두고 프레임 구멍 모양으로 자른다 */
+.profile .av .face-badge { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; transform: none !important; border-radius: 0 !important; overflow: visible !important;
+  background: #FFF6E7; -webkit-mask: url('../assets/ui/panel/mask_panel_avatar_frame.png') center / 100% 100% no-repeat; mask: url('../assets/ui/panel/mask_panel_avatar_frame.png') center / 100% 100% no-repeat; }
+.profile .av .face-badge > img { position: absolute; left: 49.7%; top: 47.3%; width: 91% !important; height: 91% !important; transform: translate(-50%, -50%) !important; -webkit-mask: none; mask: none; }
+/* 맵 노드 얼굴은 동그란 CSS 테두리라 원형 그대로 (마스크 불필요) */
+.cnode .cface .face-badge > img { -webkit-mask: none; mask: none; }
+
+/* ---------- 32. 얼굴 크롭 둘레 여유 1.3배 (build_chars.py FACE_MARGIN) → 그림을 1.3배로 그려 둥근 틀이 자르게 ---------- */
+.face-badge > img { width: 112% !important; height: 112% !important; -webkit-mask-size: 92.6% 92.6%; mask-size: 92.6% 92.6%; }
+.face-badge.ring-profile > img { width: 107% !important; height: 107% !important; -webkit-mask-size: 97.7% 97.7%; mask-size: 97.7% 97.7%; }
+.profile .av .face-badge > img { width: 118% !important; height: 118% !important; }
+.cnode .cface .face-badge > img { width: 120% !important; height: 120% !important; margin: 0 !important; }
+.face-badge { display: flex; align-items: center; justify-content: center; }
+.face-badge > img { flex: none; object-fit: contain; }
+
+/* ---------- 33. 학습 카드 낱말 · 많은 카드 점 ---------- */
+.learn-card .words .w-list { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.learn-card .words { cursor: default; }
+.learn-dots.many { gap: 3px; flex-wrap: wrap; max-width: 300px; margin-left: auto; margin-right: auto; }
+.learn-dots.many i { width: 12px; height: 12px; }
+
+/* ---------- 34. 버튼 · 리본 글자 외곽선 (버튼 색과 같은 계열) ---------- */
+.btn { -webkit-text-stroke: 5px #C8203F; paint-order: stroke fill; text-shadow: 0 2px 0 rgba(150,20,50,0.35); }
+.btn.yellow { -webkit-text-stroke-color: #D16A00; text-shadow: 0 2px 0 rgba(170,85,0,0.35); }
+.btn.mint { -webkit-text-stroke-color: #1E8C6B; }
+.btn.disabled, .btn:disabled { -webkit-text-stroke-color: #8F8A87; text-shadow: none; }
+.btn.small { -webkit-text-stroke-width: 4px; }
+.ribbon span { -webkit-text-stroke: 6px #D6457A; paint-order: stroke fill; text-shadow: none !important; }
+.ribbon.blue span { -webkit-text-stroke-color: #2F6FC0; }
+
+/* ---------- 35. 스티커북 (위 3/5: panel_notebook · 책장 넘기기 / 한자 스티커 / 수량 박스) ---------- */
+.stickers-screen .wall-box { overflow: hidden; }
+.nb-book { position: absolute; left: 14px; right: 14px; top: calc(var(--safe-top) + 56px); bottom: 52px; perspective: 900px;
+  background: url('../assets/ui/panel/panel_notebook.png') center / contain no-repeat; filter: drop-shadow(0 6px 8px rgba(120,60,60,0.22)); }
+.nb-paper { position: absolute; transform-origin: 0 50%; }
+.nb-paper .hint { position: absolute; left: 10%; right: 10%; top: 44%; text-align: center; font-family: var(--jua); font-size: 16px; color: #B89A86; pointer-events: none; }
+.nb-paper.turn-out-next { animation: nb-out 220ms ease-in forwards; }
+.nb-paper.turn-in-next  { animation: nb-in 240ms ease-out; }
+.nb-paper.turn-out-prev { animation: nb-out-prev 220ms ease-in forwards; transform-origin: 100% 50%; }
+.nb-paper.turn-in-prev  { animation: nb-in-prev 240ms ease-out; transform-origin: 100% 50%; }
+@keyframes nb-out { to { transform: rotateY(-88deg); opacity: 0.6; } }
+@keyframes nb-in { from { transform: rotateY(60deg); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes nb-out-prev { to { transform: rotateY(88deg); opacity: 0.6; } }
+@keyframes nb-in-prev { from { transform: rotateY(-60deg); opacity: 0.4; } to { transform: none; opacity: 1; } }
+.nb-nav { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 18px; z-index: 3; }
+.nb-nav .nb-prev .round-btn { transform: scaleX(-1); }
+.nb-nav .nb-page { position: relative; height: 34px; padding: 0 18px 2px; font-size: 16px; }
+.hanja-sticker { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; background: #FFFBF2; border: 3px solid #A9795B; border-radius: 14px;
+  box-shadow: 0 0 0 2px #fff, 0 3px 4px rgba(90,62,43,0.2); line-height: 1; color: var(--ink); }
+.hanja-sticker .hanja { font-size: 1em; }
+.hanja-sticker .hs-hun { font-family: var(--jua); font-size: 0.26em; color: var(--ink2); margin-top: 3px; white-space: nowrap; }
+.tab-hanja { font-family: var(--serif); font-weight: 700; font-size: 28px; color: var(--ink); line-height: 1; }
+
+/* ---------- 36. 스티커북 v2: 짧은 노트 · 넘기는 종이 · 넘김 점 · 크기/돌리기 손잡이 · 칸 크기 ---------- */
+.nb-book { right: auto; bottom: auto; transform: translateX(-50%); background-image: url('../assets/ui/panel/notebook_short.png'); background-size: 100% 100%; perspective: 1200px; }
+.nb-paper { background: url('../assets/ui/panel/notebook_page.png') center / 100% 100% no-repeat; }
+.nb-paper .wall-sticker .rs { position: absolute; right: -14px; bottom: -14px; width: 28px; height: 28px; border-radius: 50%; background: #5FB8F0; box-shadow: 0 3px 0 #2F7FB8;
+  display: none; align-items: center; justify-content: center; pointer-events: auto; cursor: nwse-resize; touch-action: none; }
+.nb-paper .wall-sticker.sel .rs { display: flex; }
+.nb-paper .wall-sticker.sel::before { content: ''; position: absolute; inset: -8px; border: 3px dashed var(--pink); border-radius: 18px; }
+.nb-leaf { pointer-events: none; transform-origin: 0 50%; backface-visibility: hidden; z-index: 5; box-shadow: 0 0 0 rgba(0,0,0,0); }
+.nb-leaf.leaf-out { animation: leaf-out 520ms cubic-bezier(.45,.05,.55,.95) forwards; }
+.nb-leaf.leaf-in  { animation: leaf-in 520ms cubic-bezier(.45,.05,.55,.95) forwards; }
+@keyframes leaf-out { 0% { transform: rotateY(0); filter: brightness(1); } 60% { filter: brightness(0.9); } 100% { transform: rotateY(-105deg); filter: brightness(0.8); } }
+@keyframes leaf-in  { 0% { transform: rotateY(-105deg); filter: brightness(0.8); } 100% { transform: rotateY(0); filter: brightness(1); } }
+.nb-dots { position: absolute; left: 0; right: 0; display: flex; justify-content: center; z-index: 3; }
+.nb-dots i { width: var(--dot, 16px); height: var(--dot, 16px); border-radius: 50%; background: #fff; border: 3px solid #F7A9C0; box-shadow: 0 2px 0 rgba(225,76,110,0.25); cursor: pointer; }
+.nb-dots i.on { background: linear-gradient(180deg, #FF93B4, #FF5F8F); border-color: #fff; box-shadow: 0 0 0 2px #F7A9C0, 0 2px 0 rgba(225,76,110,0.35); }
+.pink-panel .pgrid { grid-template-columns: repeat(auto-fill, var(--cell, 100px)); justify-content: center; }
+.tchip .box { width: var(--cell, 100px); height: var(--cell, 100px); }
+
+/* ---------- 37. 스티커 화면 다듬기 · 핑크 스크롤 ---------- */
+.nb-dots i, .nb-dots i.on { box-shadow: none; }
+.nb-dots i.on { box-shadow: 0 0 0 2px #F7A9C0; }
+.tchip { gap: 0; }
+.tchip .n { margin-top: -10px; position: relative; z-index: 1; }
+.hanja-sticker { background: none; border: none; box-shadow: none; border-radius: 0;
+  text-shadow: 0 0 2px #fff, 0 0 3px #fff, 0 1px 0 #fff; }
+.hanja-sticker .hs-hun { color: var(--ink); }
+.pink-panel { display: flex; flex-direction: column; align-items: center; }
+.pink-panel .pinner { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.pink-panel .pinner .pgrid { justify-content: start; padding-right: 0; }
+/* 스크롤 막대: 모두 핑크 */
+#app * { scrollbar-color: #FF8FB0 transparent; scrollbar-width: thin; }
+#app *::-webkit-scrollbar { width: 6px; height: 6px; }
+#app *::-webkit-scrollbar-thumb { background: #FF8FB0; border-radius: 3px; }
+#app *::-webkit-scrollbar-track { background: transparent; }
+.map-scroll::-webkit-scrollbar { display: none; }
+
+/* ---------- 38. 스티커 아래 상자 다시 짜기: 책 폭 · 자동 칸 · 스크롤 자리 분리 · 이름 겹침 없음 · 큰 한자 ---------- */
+.pink-panel { padding: 22px 18px 0; }
+.pink-panel .pinner .pgrid { scrollbar-gutter: stable; padding-bottom: 20px; }
+.tchip { gap: 5px; }
+.tchip .box { width: var(--cell, 96px); height: var(--cell, 96px); }
+.tchip .n { margin-top: 0; font-size: var(--label, 13px); line-height: 1.15; max-width: var(--cell, 96px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tchip .s { font-size: 11px; margin-top: -2px; }
+.hanja-sticker .hs-hun { font-size: 0.3em; margin-top: 4px; }
+.pink-panel .ptabs { margin-bottom: 8px; }
+.pink-panel .phint { margin-bottom: 10px; }
+
+/* ---------- 39. 스티커 아래 상자: 조정 모드 변수 ---------- */
+.tchip { gap: 0; }
+.tchip .n { margin-top: var(--label-y, 5px); }   /* 음수면 칸 위로 겹쳐 올라간다 */
+.hanja-sticker .hs-hun { font-size: calc(1em * var(--hun, 0.3)); }
+.pink-panel .pinner .pgrid::-webkit-scrollbar { width: var(--scroll-w, 6px); }
+.pink-panel .ptabs .tab-square { width: var(--tab, 58px); height: var(--tab, 58px); }
+.pink-panel .ptabs .tab-square > img, .pink-panel .ptabs .tab-square .face-badge { transform: scale(var(--tab-k, 1)); }
+
+/* ---------- 40. 스티커: 배경 전체 · 가로 스크롤 없음 · 칸 가운데 ---------- */
+.stickers-screen .wall-box { inset: 0; height: auto !important; }
+.pink-panel { overflow: hidden; z-index: 4; }
+.pink-panel .pinner { width: 100%; align-self: stretch; }
+.pink-panel .pinner .pgrid { overflow-x: hidden; overflow-y: auto; scrollbar-gutter: auto; box-sizing: border-box; }
+
+/* ---------- 41. 스티커: 직접 그린 스크롤 막대 · 휘어지는 종이 넘기기 ---------- */
+.pink-panel .pinner .pgrid { scrollbar-width: none; }
+.pink-panel .pinner .pgrid::-webkit-scrollbar { display: none; }
+.sbar { position: absolute; border-radius: 99px; background: rgba(255,143,176,0.22); z-index: 5; }
+.sbar-thumb { position: absolute; left: 0; right: 0; border-radius: 99px; background: #FF8FB0; cursor: grab; touch-action: none; }
+.nb-book { transform-style: preserve-3d; }
+.curl-wrap { position: absolute; transform-style: preserve-3d; z-index: 6; pointer-events: none; }
+.curl-strip { position: absolute; top: 0; transform-origin: 0 50%; transform-style: preserve-3d; }
+.curl-front, .curl-back { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.curl-back { transform: rotateY(180deg); background: url('../assets/ui/panel/notebook_page.png') no-repeat; filter: brightness(0.93) saturate(0.85); }
+.curl-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(90,50,30,0.0), rgba(90,50,30,0.55)); opacity: 0; pointer-events: none; }
+.curl-back .curl-shade { background: linear-gradient(270deg, rgba(90,50,30,0.0), rgba(90,50,30,0.5)); }
+.curl-cast { position: absolute; z-index: 5; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, rgba(80,40,30,0.32) 0%, rgba(80,40,30,0.12) 35%, rgba(80,40,30,0) 70%) no-repeat; background-size: 200% 100%; }
+.curl-under { visibility: visible !important; }
+
+/* 종이 넘기기: 원근을 조금 더 깊게 · 접힌 곳 그늘 진하게 */
+.nb-book { perspective: 800px; perspective-origin: 30% 50%; }
+.curl-shade { background: linear-gradient(90deg, rgba(90,50,30,0.05), rgba(90,50,30,0.7)); }
+.curl-back .curl-shade { background: linear-gradient(270deg, rgba(90,50,30,0.05), rgba(90,50,30,0.6)); }
+
+/* ---------- 42. 스티커 상자: 기본 스크롤 막대 완전히 숨김 (분홍 막대는 직접 그린 것 하나만) ---------- */
+#app .pink-panel .pgrid { scrollbar-width: none !important; }
+#app .pink-panel .pgrid::-webkit-scrollbar { display: none !important; width: 0 !important; }
+.char-sticker { filter: drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff) drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff); }
+.tchip .box .char-sticker { filter: none; }
+
+/* ---------- 43. 스티커: 아직 클리어 안 한 스테이지의 캐릭터는 잠김 ---------- */
+.tchip.locked .box { position: relative; filter: none; }
+.tchip.locked .box .char-sticker { filter: grayscale(1) brightness(1.15) opacity(0.45); }
+.tchip.locked .tlock { position: absolute; left: 50%; top: 50%; width: 30%; height: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 2px 2px rgba(0,0,0,.22)); pointer-events: none; }
+.tchip.locked .n { color: #A99C94; }
+/* 맵: 스크롤 막대만 숨김 (#app * 의 분홍 막대 규칙보다 우선). 처음 보이는 위치는 진행에 따라 정해진다 */
+#app .map-scroll { scrollbar-width: none !important; }
+#app .map-scroll::-webkit-scrollbar { display: none !important; width: 0 !important; }
+
+/* ---------- 44. 결과 반짝이 · 도감 스크롤 막대 · 저어주기 ---------- */
+.result-glitter { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 4; }
+.result-glitter .sparkle { transform: translate(-50%, -50%); filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
+@keyframes glitter { 0%, 100% { opacity: 0.15; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15) rotate(25deg); } }
+.result-glitter .sparkle { animation: glitter 1100ms ease-in-out infinite; }
+#app .book-scroll { scrollbar-width: none !important; margin-right: 0; padding-right: 0; }
+#app .book-scroll::-webkit-scrollbar { display: none !important; width: 0 !important; }
+body.tuning .sbar { cursor: ns-resize; }
+
+/* 게임 과일 카드의 태그: 한글 태그와 한자 태그 높이가 달라도 아래쪽 선을 맞춘다 (위가 아니라 아래 기준으로 붙임) */
+.opts .tile .tag { top: auto; bottom: calc(100% - 27px); transform-origin: 100% 100%; }

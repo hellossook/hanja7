@@ -1,0 +1,30 @@
+/* 조정 모드 패널 (index.html?tune=1) — 게임 화면 옆(넓은 화면) 또는 아래(좁은 화면)에 붙는다 */
+body.tuning #stage { right: 360px; }
+body.tuning #app *, body.tuning #app *::before, body.tuning #app *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }
+body.tuning .tuned-skewer .skewer, body.tuning .skewer-wrap .skewer, body.tuning .bowl-wrap, body.tuning [data-tx] { cursor: grab; outline: 1.5px dashed rgba(225,76,110,0.6); outline-offset: 4px; }
+body.tuning .tp-dragging .skewer, body.tuning .bowl-wrap.tp-dragging { cursor: grabbing; outline: 2px solid #E14C6E; }
+.tune-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 360px; z-index: 1000; display: flex; flex-direction: column; background: #FFFBF4; border-left: 1px solid #E8D8C8;
+  font: 13px/1.35 -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; color: #4A3628; -webkit-user-select: auto; user-select: auto; touch-action: auto; }
+.tp-head { padding: 14px 16px 8px; display: flex; flex-direction: column; gap: 2px; }
+.tp-head b { font-size: 16px; }
+.tp-head small, .tp-label small { color: #9A8474; font-size: 11.5px; }
+.tp-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 16px 10px; border-bottom: 1px solid #EFE2D4; }
+.tp-tab { border: 1px solid #E3CDB8; background: #fff; border-radius: 999px; padding: 5px 11px; font: inherit; cursor: pointer; }
+.tp-tab.on { background: #E14C6E; border-color: #E14C6E; color: #fff; font-weight: 600; }
+.tp-body { flex: 1; overflow-y: auto; padding: 8px 16px 12px; }
+.tp-row { padding: 9px 0; border-bottom: 1px dashed #EFE2D4; }
+.tp-label { display: flex; flex-direction: column; margin-bottom: 5px; }
+.tp-ctl { display: flex; align-items: center; gap: 6px; }
+.tp-ctl input[type=range] { flex: 1; min-width: 0; accent-color: #E14C6E; }
+.tp-num { width: 62px; padding: 4px 6px; border: 1px solid #DCC6B2; border-radius: 6px; font: inherit; text-align: right; }
+.tp-step { width: 26px; height: 26px; border: 1px solid #DCC6B2; background: #fff; border-radius: 6px; font: 15px/1 inherit; cursor: pointer; }
+.tp-foot { border-top: 1px solid #EFE2D4; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+.tp-status { font-size: 12px; color: #6B8F5A; min-height: 16px; }
+.tp-status.dirty { color: #C0572F; }
+.tp-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.tp-btn { border: 1px solid #DCC6B2; background: #fff; border-radius: 8px; padding: 7px 10px; font: inherit; cursor: pointer; }
+.tp-btn.primary { background: #E14C6E; border-color: #E14C6E; color: #fff; font-weight: 600; flex: 1 0 100%; padding: 9px; }
+@media (max-width: 760px) {
+  body.tuning #stage { right: 0; bottom: 46vh; }
+  .tune-panel { top: auto; left: 0; width: auto; height: 46vh; border-left: none; border-top: 1px solid #E8D8C8; }
+}
