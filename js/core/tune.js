@@ -7,7 +7,7 @@ export const TUNE_DEFAULTS = {
               panelPadX: 18, panelPadTop: 22, sbX: 12, sbTop: 118, sbBottom: 12, scrollW: 6, labelY: 5, stickerScale: 74, hanjaScale: 84, hanjaFont: 56, hunSize: 30, tabSize: 58, tabGap: 12, hintSize: 13, hintGap: 10 },
   map:    { profX: 12, profY: 6, profW: 208, profH: 82, profAvatar: 60, nameSize: 14.5, nameX: 0, nameY: 0, barW: 0, barH: 14, barX: 0, barY: 0,
             n1X: 88, n1Y: 1080, n2X: 262, n2Y: 898, n3X: 72, n3Y: 640, n4X: 300, n4Y: 480, n5X: 320, n5Y: 330, n6X: 255, n6Y: 215, gateX: 182, gateY: 95, gateLockX: 33, gateLockY: 34, gateLockSize: 40,
-            cam1Y: 528, cam2Y: 380, cam3Y: 0, camView: 0 },
+            cam1Y: 481, cam2Y: 333, cam3Y: 0, camView: 0 },
   book:   { sbX: 8, sbTop: 100, sbBottom: 26, scrollW: 6 },
   game:   { fruitSize: 137, gap: 64, stickLength: 0, tipCover: 9, x: 0, y: 0, pillsX: 16, pillsY: 38,
             backX: 14, backY: 2, backSize: 42, noteX: 0, noteY: 0, noteW: 300, noteH: 146, tilesX: 14, tilesY: 0, tileSize: 0, tileGap: 0, fruitScale: 72, tagX: 0, tagY: 0, tagScale: 100, dotsX: 30, dotsY: 4, dotSize: 30, dotGap: 12 },

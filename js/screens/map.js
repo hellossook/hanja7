@@ -4,7 +4,7 @@ import { tune, tuneMode } from '../core/tune.js';
 import { progress, stageState } from '../core/store.js';
 import { STAGES, STAGE_ORDER, REVIEW_THRESHOLD, REVIEW_BONUS } from '../data/stages.js';
 import { box0Ids } from '../quiz.js';
-import { sfx, setSound } from '../core/audio.js';
+import { sfx, setSound, buzz } from '../core/audio.js';
 import { profileCard } from './title.js';
 import { save } from '../core/store.js';
 
@@ -43,12 +43,35 @@ export function reviewDialog(root, dueIds) {
   return ov;
 }
 
+/** 가게 이름 바꾸기 (프로필의 연필) */
+export function renameDialog(root, onDone) {
+  const ov = el('div.overlay');
+  ov.append(el('div.scrim', { onClick: () => ov.remove() }));
+  const input = el('input.rename-input', { type: 'text', maxlength: '12', value: progress.shopName, placeholder: '가게 이름 (12자까지)', autocomplete: 'off' });
+  const ok = () => {
+    const v = input.value.trim().slice(0, 12);
+    if (!v) { input.focus(); return; }
+    progress.shopName = v; save(); sfx.pop(); ov.remove(); onDone && onDone();
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') ok(); });
+  const dlg = el('div.dialog.rename.pop-in', { style: { top: 'calc(var(--safe-top) + 120px)' } },
+    el('div.dtitle', { text: '가게 이름 바꾸기' }),
+    input,
+    el('div.dbtn.two', {}, button('취소', 'small', () => { sfx.tap(); ov.remove(); }), button('확인', 'yellow small', ok)));
+  ov.append(dlg); root.append(ov);
+  setTimeout(() => { input.focus(); input.select(); }, 60);
+  return ov;
+}
+
 registerScreen('map', (root, params = {}) => {
   const scroll = el('div.map-scroll');
   const world = el('div.map-world.candy');
   world.append(el('img', { src: MAP + 'bg_map_candy.jpg', alt: '', class: 'bg', style: { position: 'absolute', left: 0, top: PAD + 'px', width: '393px', height: '1180px' } }));
 
   let currentId = null;
+  const pending = progress.pendingClear;                                   // 방금 처음 깬 스테이지: 도장 → 다음 가게 열림 연출
+  const nextOfPending = pending ? STAGE_ORDER[STAGE_ORDER.indexOf(pending) + 1] : null;
+  const fx = { stampNode: null, unlockNode: null, unlockOv: null };
   STAGES.forEach((s, si) => {
     const m = tune().map, k = si + 1;
     const x = m['n' + k + 'X'], y0 = m['n' + k + 'Y'], y = y0 + PAD;   // 노드 위치 (맵 그림 기준) — 조정 모드 '맵'
@@ -59,12 +82,18 @@ registerScreen('map', (root, params = {}) => {
     if (state === 'lock') node.append(mapImg('lock_' + NODE_LOCK[s.id], 'lockico'));
     if (state === 'clear') {
       const st = stageState(s.id).bestStars;
-      const row = el('div.cstars');
+      const row = el('div.cstars' + (s.id === pending ? '.hid' : ''));
       for (let i = 0; i < 3; i++) row.append(img(i < st ? 'star_on' : 'star_off', { class: 'st' }));   // 노란 별 (icon_star_full_2)
       node.append(row);
     }
     node.append(el('div.clabel', { text: `${si + 1}. ${s.name}` }));   // "2. 하늘과 땅"
-    if (state === 'clear') node.append(el('div.cclear'));                // 클리어 리본
+    if (state === 'clear') node.append(el('div.cclear' + (s.id === pending ? '.hid' : '')));   // 클리어 리본 (방금 깼으면 도장 연출 뒤에)
+    if (s.id === pending) fx.stampNode = node;
+    if (s.id === nextOfPending && state === 'open') {                    // 다음 가게: 잠긴 모습으로 시작했다가 열린다
+      node.classList.add('pre');
+      const ov = el('div.unlock-ov', {}, mapImg('node_lock', 'ball'), mapImg('lock_' + NODE_LOCK[s.id], 'lockico'));
+      node.append(ov); fx.unlockNode = node; fx.unlockOv = ov;
+    }
     const face = el('div.cface', {}, faceBadge(s.customer, 34));         // 손님 얼굴 (테두리 = 스테이지 색)
     face.style.setProperty('--ring', state === 'lock' ? LOCK_GRAY : NODE_COLOR[s.id]);
     node.append(face);
@@ -116,6 +145,28 @@ registerScreen('map', (root, params = {}) => {
           snd))));
   root.append(top);
 
+  /** 처음 깬 스테이지: 클리어 리본이 도장처럼 쿵 찍히고, 다음 가게의 자물쇠가 터지며 열린다 (한 번만) */
+  function playClearFx() {
+    progress.pendingClear = null; save();
+    const n = fx.stampNode;
+    setTimeout(() => {
+      if (n) {
+        const rib = n.querySelector('.cclear'), st = n.querySelector('.cstars');
+        if (rib) { rib.classList.remove('hid'); rib.classList.add('stamp'); }
+        n.classList.add('thud'); sfx.stamp(); buzz(40);
+        setTimeout(() => { if (st) { st.classList.remove('hid'); st.classList.add('pop'); } }, 380);
+      }
+    }, 450);
+    if (fx.unlockNode) setTimeout(() => {
+      fx.unlockOv.classList.add('go'); fx.unlockNode.classList.remove('pre'); fx.unlockNode.classList.add('born');
+      sfx.unlock(); buzz(20);
+      const r = fx.unlockNode;
+      [[-30, -20, '#FFD84F'], [70, -26, '#fff'], [-38, 40, '#fff'], [78, 44, '#FFD84F'], [20, -44, '#FFE9A8'], [22, 84, '#FFD84F']].forEach(([x, y, c], i) =>
+        r.append(el('div.sparkle.burst', { style: { left: (33 + x) + 'px', top: (33 + y) + 'px', animationDelay: (i * 60) + 'ms' } }, icon.sparkle(18, c))));
+      setTimeout(() => { fx.unlockOv.remove(); r.querySelectorAll('.sparkle.burst').forEach(x => x.remove()); }, 1400);
+    }, 1350);
+  }
+
   /** 왼쪽 위 프로필: 위치·크기·이름·게이지를 조정 모드 '맵'에서 */
   function mapProfile() {
     const m = tune().map;
@@ -125,6 +176,8 @@ registerScreen('map', (root, params = {}) => {
     const name = card.querySelector('.name'); Object.assign(name.style, { fontSize: m.nameSize + 'px', transform: `translate(${m.nameX}px, ${m.nameY}px)` });
     const bar = card.querySelector('.bar'); Object.assign(bar.style, { height: m.barH + 'px', transform: `translate(${m.barX}px, ${m.barY}px)` });
     if (m.barW) Object.assign(bar.style, { width: m.barW + 'px', flex: 'none' });
+    name.addEventListener('click', e => { e.stopPropagation(); sfx.tap(); renameDialog(root, () => { name.querySelector('.nm').textContent = progress.shopName; }); });   // 연필: 가게 이름 바꾸기
+    name.style.cursor = 'pointer';
     return el('div.map-profile', { 'data-tx': 'profX', 'data-ty': 'profY', style: { left: m.profX + 'px', top: `calc(var(--safe-top) + ${m.profY}px)`, width: m.profW + 'px' } }, card);
   }
 
@@ -136,11 +189,13 @@ registerScreen('map', (root, params = {}) => {
     const from = lastCam == null || tuneMode ? to : lastCam;   // 조정 모드에서는 바로 그 화면으로
     lastCam = to;
     scroll.scrollTop = from;
+    const camDelay = pending ? 2100 : 350;                // 도장 · 열림 연출이 끝난 뒤에 움직인다
     if (from !== to) {                                    // 다음 구간이 열렸으면 부드럽게 올라간다
       const t0 = performance.now(), D = 1100;
-      const step = t => { const k = Math.min(1, (t - t0 - 350) / D); if (k > 0) scroll.scrollTop = from + (to - from) * (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2); if (k < 1) requestAnimationFrame(step); };
+      const step = t => { const k = Math.min(1, (t - t0 - camDelay) / D); if (k > 0) scroll.scrollTop = from + (to - from) * (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2); if (k < 1) requestAnimationFrame(step); };
       requestAnimationFrame(step);
     }
+    if (pending) playClearFx();
     if (params.demoDialog) reviewDialog(root, dueIds.length ? dueIds : ['天', '地', '川', '海', '林']);
   }, 0);
 });

@@ -13,7 +13,7 @@ function stagePct() { return Math.round(STAGES.filter(s => stageState(s.id).clea
 export function profileCard(glow = false, compact = false) {
   const av = el('div.av', {}, faceBadge('boss', compact ? 52 : 66), el('div.day', { text: `${dayCount()}일차` }));
   const card = el('div.profile' + (compact ? '.compact' : ''), {}, av,
-    el('div.info', {}, el('div.name', {}, '사장님네 탕후루', icon.pencil(compact ? 15 : 18)), el('div.bar', {}, el('i', { style: { width: Math.max(6, stagePct()) + '%' } }))));
+    el('div.info', {}, el('div.name', {}, el('span.nm', { text: progress.shopName }), icon.pencil(compact ? 15 : 18)), el('div.bar', {}, el('i', { style: { width: Math.max(6, stagePct()) + '%' } }))));
   if (glow) return el('div', { style: { position: 'relative' } }, el('div.splash-glow', { style: { left: '-60px', top: '-60px' } }), card);
   return card;
 }

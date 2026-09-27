@@ -1,7 +1,7 @@
 // 진입점
 import { initScale } from './core/scale.js';
 import { go } from './core/ui.js';
-import { unlockAudio } from './core/audio.js';
+import { unlockAudio, bgm } from './core/audio.js';
 import { loadSkins, startSkins } from './core/skin.js';
 import { loadTuning, tuneMode } from './core/tune.js';
 import { HANJA } from './data/hanja.js';
@@ -14,7 +14,7 @@ import './screens/book.js';
 import './screens/stickers.js';
 
 initScale();
-window.addEventListener('pointerdown', unlockAudio, { once: true });
+window.addEventListener('pointerdown', () => { unlockAudio(); document.body.dataset.bgm = '1'; bgm.start(); }, { once: true });   // 첫 터치에서 오디오를 깨우고 배경 음악 시작
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('gesturestart', e => e.preventDefault());
 

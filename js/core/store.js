@@ -15,6 +15,8 @@ function fresh() {
     chars: {},             // { '天': { box, wrongCount, lastSeen, asked } }
     settings: { sound: true },
     tutorialDone: false,
+    shopName: '사장님네 탕후루',   // 맵 프로필의 연필로 바꾼다
+    pendingClear: null,            // 방금 처음 깬 스테이지 (맵에서 도장 연출 한 번)
   };
 }
 
@@ -26,6 +28,7 @@ function load() {
     if (!raw) return fresh();
     const p = Object.assign(fresh(), JSON.parse(raw));
     p.settings = Object.assign({ sound: true }, p.settings || {});
+    if (!p.shopName || !String(p.shopName).trim()) p.shopName = '사장님네 탕후루';
     delete p.diary; delete p.gallery;
     p.unlocks = p.unlocks.map(id => id === 'goldberry' ? 'rainbowjelly' : id);   // 황금 딸기 → 무지개 젤리 (그림 교체)
     for (const id of p.stickers) {
@@ -72,6 +75,7 @@ export function stageState(id) {
 export function recordStage(id, stars) {
   const s = progress.stages[id] || (progress.stages[id] = { cleared: false, bestStars: 0, plays: 0 });
   const first = !s.cleared;
+  if (first) progress.pendingClear = id;       // 맵에 돌아가면 도장 · 다음 가게 열림 연출
   s.cleared = true;
   s.bestStars = Math.max(s.bestStars, stars);
   s.plays += 1;

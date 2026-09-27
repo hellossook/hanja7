@@ -2,6 +2,7 @@
 export const BASE_W = 393;
 export const MIN_H = 640;
 export const MAX_H = 1000;
+export const SIM_SAFE_TOP = 59, SIM_SAFE_BOTTOM = 34;   // 아이폰 15 (다이내믹 아일랜드 · 홈 바)
 
 export const view = { w: BASE_W, h: 852, scale: 1, safeTop: 12, safeBottom: 12, left: 0, top: 0 };
 
@@ -18,9 +19,12 @@ export function applyScale() {
   else if (h < MIN_H) { scale = vh / MIN_H; h = MIN_H; }      // 넓은 화면(iPad 등): 양옆 여백
   else if (h > MAX_H) { h = MAX_H; }                          // 아주 긴 화면: 위아래 여백
   const cs = getComputedStyle(probe);
-  const st = parseFloat(cs.paddingTop) || 0, sb = parseFloat(cs.paddingBottom) || 0;
+  let st = parseFloat(cs.paddingTop) || 0, sb = parseFloat(cs.paddingBottom) || 0;
+  // 기기 안전영역이 없는 곳(맥 브라우저·스크린샷·조정 모드)에서는 아이폰 15 값(위 59 · 아래 34)으로 가정한다 → 미리보기가 실제 아이폰과 같아진다
+  const q = new URLSearchParams(location.search);
+  if (!st && !sb && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
   // 앱이 화면 전체를 채울 때만 기기 안전영역이 의미 있다 (여백이 생기면 이미 안전함)
-  const fills = Math.abs(h * scale - vh) < 2;
+  const fills = Math.abs(h * scale - vh) < 2 || document.body.classList.contains('tuning');
   view.safeTop = Math.max(12, fills ? st / scale : 0);
   view.safeBottom = Math.max(12, fills ? sb / scale : 0);
   view.scale = scale; view.h = h;

@@ -13,12 +13,12 @@ registerScreen('result', (root, p) => {
     root.append(el('div.sparkle', { style: { left: x + 'px', top: y + 'px', animationDelay: i * 200 + 'ms' } }, icon.sparkle(s, '#fff'))));
   const rc = tune().result;
   /** 글자 묶음을 가운데 기준으로 놓는다 (x = 가운데에서 옮긴 만큼, y = 화면 위에서). 조정 모드 '결과'에서 끌어 옮길 수 있다 */
-  const place = (node, kx, ky, x, y) => el('div.r-place', { 'data-tx': kx || null, 'data-ty': ky, 'data-tmode': kx ? 'center' : '', style: { left: `calc(50% + ${x}px)`, top: `calc(var(--safe-top) + ${y}px)` } }, node);
+  const place = (node, kx, ky, x, y, safe = false) => el('div.r-place', { 'data-tx': kx || null, 'data-ty': ky, 'data-tmode': (kx ? 'center' : '') + (safe ? '' : ' plain'), style: { left: `calc(50% + ${x}px)`, top: safe ? `calc(var(--safe-top) + ${y}px)` : y + 'px' } }, node);
   const title = p.review ? '복습 완료!' : `${STAGE_ORDER.indexOf(p.stageId) + 1}. ${STAGE_BY_ID[p.stageId].name} 클리어!`;
   const rib = ribbon(title, 'pink');
   if (rc.titleSize) rib.querySelector('span').style.fontSize = rc.titleSize + 'px';
   rib.querySelector('span').style.top = rc.titleTextY + 'px';   // 리본 안 글씨 높이
-  root.append(place(el('div.result-ribbon.pop-in', {}, rib), 'titleX', 'titleY', rc.titleX, rc.titleY));
+  root.append(place(el('div.result-ribbon.pop-in', {}, rib), 'titleX', 'titleY', rc.titleX, rc.titleY, true));   // 제목만 안전영역(노치) 아래로
 
   // 이번 스테이지에서 만든 탕후루를 전부 (부채꼴로 나란히). 위치·간격·벌림은 조정 모드 '결과'
   const last = p.last || { fruits: ['strawberry', 'tangerine', 'grape', 'blueberry', 'kiwi'], coat: 'sugar' };
@@ -47,7 +47,7 @@ registerScreen('result', (root, p) => {
   if (p.unlock) extras.push(`새 ${p.unlock.type === 'fruit' ? '과일' : '코팅'} ${unlockName(p.unlock)}`);
   const doneText = el('div.done-text', { style: { fontSize: rc.doneSize + 'px' }, text: p.review ? '새콤달콤 복습 탕후루를 다 팔았어요!' : '새콤달콤 탕후루 3개 모두 판매했어요!' });
   root.append(place(el('div.result-done', {}, doneText), 'doneX', 'doneY', rc.doneX, rc.doneY));
-  const cta = el('div.result-cta', { style: { bottom: 'calc(var(--safe-bottom) + 64px)' } });
+  const cta = el('div.result-cta', { style: { bottom: 'calc(var(--safe-bottom) + 44px)' } });
   const line = el('div.result-line', { style: { fontSize: rc.lineSize + 'px' }, text: extras.join(' · ') });
   root.append(cta, place(line, null, 'lineY', 0, rc.lineY));
 
@@ -64,7 +64,7 @@ registerScreen('result', (root, p) => {
     });
     root.append(place(el('div.reward-text.pop-in', { style: { fontSize: rc.rewardSize + 'px' }, text: `젤리 ${p.jelly}개를 받았어요!` }), null, 'rewardY', 0, rc.rewardY));
     if (extras.length) root.append(place(el('div.result-line', { style: { fontSize: rc.lineSize + 'px' }, text: extras.join(' · ') }), null, null, 0, rc.rewardY + 50));
-    const next = el('div.result-cta', { style: { bottom: 'calc(var(--safe-bottom) + 40px)' } }, button('가게로 돌아가기', 'block', () => go('map')));
+    const next = el('div.result-cta', { style: { bottom: 'calc(var(--safe-bottom) + 30px)' } }, button('가게로 돌아가기', 'block', () => go('map')));
     if (!p.review) next.append(el('div', { style: { textAlign: 'center', marginTop: '6px' } }, el('button.text-btn', { text: '한 번 더', onClick: () => { sfx.tap(); go('game', { stageId: p.stageId }); } })));
     setTimeout(() => root.append(next), 900);
   }

@@ -4,7 +4,7 @@ import { STAGE_BY_ID, jellyFor, starsFor, REVIEW_BONUS, COATINGS, ORDER_LINES, C
 import { buildStage, buildReview } from '../quiz.js';
 import { progress, recordAnswer, recordStage, addJelly, grantSticker, grantUnlock, unlockedCoats, addWallSticker, save } from '../core/store.js';
 import { stickerEl, randomWallSpot, VARIANT_COUNT } from '../wall.js';
-import { sfx } from '../core/audio.js';
+import { sfx, buzz } from '../core/audio.js';
 import { logicalRect, toLogical } from '../core/scale.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { tune } from '../core/tune.js';
@@ -110,7 +110,11 @@ registerScreen('game', (root, params) => {
   function layout() {
     const h = Math.max(240, body.clientHeight);
     S.tileSize = tune().game.tileSize || Math.max(58, Math.min(84, Math.floor((h - 16 - 3 * 18) / 4)));   // 0 = 화면 높이에 맞춤
-    opts.style.gap = (tune().game.tileGap || (S.tileSize > 70 ? 20 : 14)) + 'px';
+    let tgap = tune().game.tileGap || (S.tileSize > 70 ? 20 : 14);
+    const room = h - tune().game.tilesY - 8;                                 // 과일 칸 4개가 들어갈 자리 (아이폰 안전영역이 크면 좁아진다)
+    if (4 * S.tileSize + 3 * tgap > room) tgap = Math.max(6, Math.floor((room - 4 * S.tileSize) / 3));
+    if (4 * S.tileSize + 3 * tgap > room) S.tileSize = Math.max(48, Math.floor((room - 3 * tgap) / 4));
+    opts.style.gap = tgap + 'px';
     const c = tune().game;
     S.stickH = c.stickLength || (h - 16 - c.y);             // 막대 길이 0 = 화면 아래까지
     // 과일 5개가 막대보다 길면(작은 화면) 들어가게 과일 크기를 줄인다
@@ -196,6 +200,7 @@ registerScreen('game', (root, params) => {
     t.addEventListener('pointerdown', e => {
       if (S.locked || S.dragging || t.classList.contains('dim')) return;
       e.preventDefault();
+      sfx.pick(); buzz(12);                                        // 과일을 집었다 (톡 + 진동)
       const src = t.querySelector('.tile-in img');
       const r0 = logicalRect(src), p0 = toLogical(e.clientX, e.clientY);
       const ghost = el('div.drag-fruit', { style: { left: r0.x + 'px', top: r0.y + 'px', width: r0.w + 'px', height: r0.h + 'px' } }, img('fruit_' + o.fruit));
@@ -233,7 +238,7 @@ registerScreen('game', (root, params) => {
             slotY = r.y + slotTop(sk, S.onSkewer.length);
             ghost.innerHTML = ''; ghost.append(img(skewerImg(o.fruit)));
             Object.assign(ghost.style, { width: S.fw + 'px', height: fh + 'px', left: skX + 'px' });
-            ghost.classList.add('threaded'); sfx.stick();
+            ghost.classList.add('threaded'); sfx.stick(); buzz(20);
           }
         }
         if (mode === 'thread') {
@@ -259,7 +264,7 @@ registerScreen('game', (root, params) => {
   }
 
   function reject(t) {
-    S.attempts += 1; sfx.wrong();
+    S.attempts += 1; sfx.wrong(); buzz([40, 40, 40]);
     t.classList.add('shake'); setTimeout(() => t.classList.add('dim'), 320);
     const chip = note.querySelector('.chip'); if (chip) { chip.textContent = '다시 골라보자!'; chip.classList.add('retry'); }
   }
@@ -404,7 +409,7 @@ registerScreen('game', (root, params) => {
     await wait(560);
     fly.remove();
     addWallSticker(inst); save();
-    sfx.stick();
+    sfx.stick(); buzz(20);
     const note = el('div.sale-note-wrap', {}, el('div.sale-note.pop-in', {}, '벽에 스티커를 붙이고 갔어요!'));   // 화면 한가운데
     L.append(note);
     setTimeout(() => { note.classList.add('fade-out'); setTimeout(() => note.remove(), 320); }, 2000);   // 2초 뒤 사라짐

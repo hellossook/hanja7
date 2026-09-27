@@ -59,8 +59,8 @@
     "gateLockX": 32,
     "gateLockY": 31,
     "gateLockSize": 40,
-    "cam1Y": 528,
-    "cam2Y": 380,
+    "cam1Y": 481,
+    "cam2Y": 333,
     "cam3Y": 0,
     "camView": 0
   },

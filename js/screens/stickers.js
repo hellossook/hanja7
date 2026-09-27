@@ -114,10 +114,10 @@ registerScreen('stickers', (root, params = {}) => {
       st.style.transform = `rotateY(${-a}deg)`;
       acc += a;
       const face = Math.cos(acc * Math.PI / 180);                  // 이 띠가 보는 쪽을 향한 정도
-      st.querySelector('.curl-front .curl-shade').style.opacity = String(Math.min(0.55, (1 - Math.max(0, face)) * 0.6));
-      st.querySelector('.curl-back .curl-shade').style.opacity = String(Math.min(0.5, (1 - Math.max(0, -face)) * 0.55));
+      st.querySelector('.curl-front .curl-shade').style.opacity = String(Math.min(0.85, (1 - Math.max(0, face)) * 0.9));   // 그늘 자체가 연해서 거의 다 보여 준다
+      st.querySelector('.curl-back .curl-shade').style.opacity = String(Math.min(0.8, (1 - Math.max(0, -face)) * 0.85));
     });
-    L.shadow.style.opacity = String(Math.sin(Math.PI * t) * 0.9);
+    L.shadow.style.opacity = String(Math.sin(Math.PI * t) * 0.7);
     L.shadow.style.backgroundPosition = `${(1 - e) * 100}% 0`;
   }
   function animate(L, from, to) {
