@@ -1,17 +1,17 @@
 {
   "stickers": {
     "bookX": -4,
-    "bookY": 69,
+    "bookY": 53,
     "bookW": 381,
-    "nbDotsY": 450,
+    "nbDotsY": 432,
     "nbDotSize": 16,
     "nbDotGap": 10,
-    "panelTop": 491,
+    "panelTop": 467,
     "panelW": 0,
     "cols": 3,
     "cellSize": 0,
     "gridGapX": 12,
-    "gridGapY": 2,
+    "gridGapY": 1,
     "labelSize": 13,
     "panelPadX": 22,
     "panelPadTop": 22,
@@ -62,7 +62,9 @@
     "cam1Y": 528,
     "cam2Y": 333,
     "cam3Y": 0,
-    "camView": 0
+    "camView": 0,
+    "owlX": 300,
+    "owlY": 640
   },
   "book": {
     "sbX": 8,
