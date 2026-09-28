@@ -16,8 +16,21 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    // 우리 파일: 저장된 것 → 없으면 네트워크. 화면 이동(주소 직접 입력)은 index.html
-    e.respondWith(caches.match(req, { ignoreSearch: true }).then(r => r || (req.mode === 'navigate' ? caches.match('index.html') : null) || fetch(req)));
+    const code = req.mode === 'navigate' || /\.(js|css|json|webmanifest|html)$/.test(url.pathname) || url.pathname.endsWith('/');
+    if (code) {
+      // 코드(html·js·css): 인터넷이 되면 항상 새로 받아서 저장하고(→ 고친 것이 바로 반영), 안 되면(3초 넘게 걸리면) 저장된 것
+      const key = req.mode === 'navigate' ? 'index.html' : url.pathname.replace(/^.*?\/hanja7\//, '');
+      const fromCache = () => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match(key, { ignoreSearch: true }));
+      const net = fetch(req, { cache: 'no-cache' }).then(res => {
+        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req.mode === 'navigate' ? 'index.html' : req, copy)); }
+        return res;
+      });
+      const timeout = new Promise(res => setTimeout(res, 3000)).then(fromCache);
+      e.respondWith(Promise.race([net.catch(fromCache), timeout.then(r => r || net)]).then(r => r || fromCache()));
+      return;
+    }
+    // 그림·소리·글꼴: 저장된 것 먼저 (용량이 커서) → 없으면 네트워크
+    e.respondWith(caches.match(req, { ignoreSearch: true }).then(r => r || fetch(req)));
     return;
   }
   if (url.hostname.endsWith('fonts.googleapis.com') || url.hostname.endsWith('fonts.gstatic.com')) {
