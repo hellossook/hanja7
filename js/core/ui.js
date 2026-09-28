@@ -1,5 +1,5 @@
 // 공통 UI 조각: 라우터, 요소 생성, 아이콘, v2 스티커 스타일 부품, 에셋 경로
-import { sfx, buzz } from './audio.js';
+import { sfx, buzz, bgm } from './audio.js';
 
 // 에셋 매니페스트 — PNG(@3x)로 교체할 때 여기 확장자만 바꾸면 된다.
 const ASSET_DIR = 'assets/img/';
@@ -69,6 +69,7 @@ export function go(name, params = {}) {
   const root = el('div.screen.screen-enter', { 'data-screen': name });
   app.append(root);
   current = name;
+  bgm.forScreen(name);                     // 게임·결과 = 게임 음악, 그 밖 = 메뉴 음악
   screens[name](root, params);
 }
 export function currentScreen() { return current; }

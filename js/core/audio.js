@@ -149,21 +149,60 @@ function pump() {
     bgmStep = (bgmStep + 1) % 64; bgmNext += STEP;
   }
 }
+/** 배경 음악 파일 (assets/sfx/). game: 탕후루 만드는 화면·결과, menu: 그 밖의 모든 곳 (스플래시·맵·도감·스티커·학습).
+ *  파일을 WebAudio 버퍼로 읽어 끊김 없이 반복하고, 화면이 바뀌면 0.8초 동안 겹쳐 넘어간다. 파일을 못 읽으면 코드로 연주하는 곡(위)으로 대신한다 */
+const TRACKS = { game: { src: 'assets/sfx/bgm_game.mp3', vol: 0.55 }, menu: { src: 'assets/sfx/bgm_menu.mp3', vol: 0.55 } };
+const buffers = {};
+let want = 'menu', playingTrack = null, cur = null, started = false, useSynth = false;
+async function loadTrack(name) {
+  if (buffers[name]) return buffers[name];
+  const c = ac(); if (!c) return null;
+  try {
+    const res = await fetch(TRACKS[name].src); if (!res.ok) throw new Error(res.status);
+    buffers[name] = await c.decodeAudioData(await res.arrayBuffer());
+  } catch (e) { buffers[name] = null; }
+  return buffers[name];
+}
+function fadeOut(node, sec = 0.8) {
+  const c = ctx; if (!c || !node) return;
+  node.gain.cancelScheduledValues(c.currentTime); node.gain.setValueAtTime(Math.max(0.0001, node.gain.value), c.currentTime);
+  node.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + sec);
+  setTimeout(() => { try { node.src.stop(); } catch (e) { /* 이미 멈춤 */ } }, sec * 1000 + 50);
+}
+async function playTrack(name) {
+  const c = ac(); if (!c) return;
+  const buf = await loadTrack(name);
+  if (!started || want !== name || !progress.settings.sound) return;   // 읽는 사이에 화면이 또 바뀌었으면 그만
+  if (!buf) { useSynth = true; synthStart(); return; }
+  if (playingTrack === name && cur) return;
+  if (useSynth) { useSynth = false; synthStop(); }
+  if (cur) fadeOut(cur.gain);
+  const src = c.createBufferSource(), gain = c.createGain();
+  src.buffer = buf; src.loop = true; src.connect(gain); gain.connect(c.destination);
+  gain.gain.setValueAtTime(0.0001, c.currentTime); gain.gain.exponentialRampToValueAtTime(TRACKS[name].vol, c.currentTime + 0.8);
+  src.start(); gain.src = src;
+  cur = { src, gain }; playingTrack = name;
+}
+function synthStart() {
+  const c = ac(); if (!c || bgmOn) return;
+  if (!bgmGain) { bgmGain = c.createGain(); bgmGain.connect(c.destination); }
+  bgmGain.gain.setValueAtTime(0.0001, c.currentTime); bgmGain.gain.exponentialRampToValueAtTime(0.55, c.currentTime + 1.2);
+  bgmOn = true; bgmStep = 0; bgmNext = c.currentTime + 0.05;
+  pump(); bgmTimer = setInterval(pump, 120);
+}
+function synthStop() {
+  if (!bgmOn) return;
+  bgmOn = false; clearInterval(bgmTimer); bgmTimer = null;
+  const c = ctx; if (c && bgmGain) { bgmGain.gain.cancelScheduledValues(c.currentTime); bgmGain.gain.setValueAtTime(bgmGain.gain.value, c.currentTime); bgmGain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.4); }
+}
 export const bgm = {
+  /** 화면 이름에 맞는 곡을 고른다 (ui.js 의 go 가 부른다). 아직 첫 터치 전이면 기억만 해 둔다 */
+  forScreen(screen) { want = (screen === 'game' || screen === 'result') ? 'game' : 'menu'; if (started) playTrack(want); },
   /** 첫 터치 뒤에 부른다 (iOS 는 터치 전에는 소리를 못 낸다). 소리 설정이 꺼져 있으면 아무것도 안 한다 */
-  start() {
-    const c = ac(); if (!c || !progress.settings.sound || bgmOn) return;
-    if (!bgmGain) { bgmGain = c.createGain(); bgmGain.connect(c.destination); }
-    bgmGain.gain.setValueAtTime(0.0001, c.currentTime); bgmGain.gain.exponentialRampToValueAtTime(0.55, c.currentTime + 1.2);   // 서서히 커진다
-    bgmOn = true; bgmStep = 0; bgmNext = c.currentTime + 0.05;
-    pump(); bgmTimer = setInterval(pump, 120);
-  },
-  stop() {
-    if (!bgmOn) return;
-    bgmOn = false; clearInterval(bgmTimer); bgmTimer = null;
-    const c = ctx; if (c && bgmGain) { bgmGain.gain.cancelScheduledValues(c.currentTime); bgmGain.gain.setValueAtTime(bgmGain.gain.value, c.currentTime); bgmGain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.4); }
-  },
-  get playing() { return bgmOn; },
+  start() { if (!progress.settings.sound || started) return; started = true; playTrack(want); },
+  stop() { started = false; if (cur) { fadeOut(cur.gain, 0.4); cur = null; playingTrack = null; } synthStop(); },
+  get playing() { return started && (!!cur || bgmOn); },
+  get track() { return playingTrack; },
 };
 // 앱이 뒤로 가면(홈 화면·다른 앱) 멈추고, 돌아오면 다시 (소리가 켜져 있을 때)
 document.addEventListener('visibilitychange', () => { if (document.hidden) bgm.stop(); else if (progress.settings.sound && document.body.dataset.bgm === '1') bgm.start(); });
