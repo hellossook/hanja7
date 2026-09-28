@@ -5,7 +5,7 @@ import { buildStage, buildReview } from '../quiz.js';
 import { progress, recordAnswer, recordStage, addJelly, grantSticker, grantUnlock, unlockedCoats, addWallSticker, save } from '../core/store.js';
 import { stickerEl, randomWallSpot, VARIANT_COUNT } from '../wall.js';
 import { sfx, buzz, buzzOnRelease } from '../core/audio.js';
-import { logicalRect, toLogical } from '../core/scale.js';
+import { logicalRect, toLogical, view } from '../core/scale.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { tune } from '../core/tune.js';
 
@@ -309,8 +309,15 @@ registerScreen('game', (root, params) => {
     L.append(jars);
     L.append(cookPot('coat'));                                          // 빈 조리 냄비
     L.append(tunedSkewer('coat', S.onSkewer, { flip: true }));          // 손잡이가 위, 끝이 냄비 안
-    if (tutorial) L.append(el('div', { style: { position: 'absolute', left: '50%', bottom: 'calc(var(--safe-bottom) + 30px)', transform: 'translateX(-50%)' } },
-      el('div.stage-caption', { style: { position: 'static', whiteSpace: 'nowrap' }, text: '병을 탭하면 코팅이 시작돼요' })));
+    if (tutorial) {                                                     // 안내: 냄비 바로 아래 (냄비와 안 겹치게, 화면 밖으로는 안 나가게)
+      const cap = el('div.coat-caption', {}, el('div.stage-caption', { text: '병을 탭하면 코팅이 시작돼요' }));
+      L.append(cap);
+      requestAnimationFrame(() => {
+        const pot = L.querySelector('.bowl-wrap'); if (!pot) return;
+        const r = logicalRect(pot), ch = cap.offsetHeight || 30;
+        cap.style.top = Math.min(r.y + r.h + 4, view.h - ch - 2) + 'px';
+      });
+    }
   }
 
   function startStir(coat) {

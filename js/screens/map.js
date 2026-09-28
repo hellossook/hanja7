@@ -3,7 +3,8 @@ import { el, img, icon, go, registerScreen, stars, toast, pill, faceBadge, butto
 import { tune, tuneMode } from '../core/tune.js';
 import { progress, stageState } from '../core/store.js';
 import { STAGES, STAGE_ORDER, REVIEW_THRESHOLD, REVIEW_BONUS } from '../data/stages.js';
-import { box0Ids } from '../quiz.js';
+import { box0Ids, reviewSet } from '../quiz.js';
+import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { sfx, setSound, buzz } from '../core/audio.js';
 import { profileCard } from './title.js';
 import { save } from '../core/store.js';
@@ -29,15 +30,24 @@ function nodeState(id) {
   return stageState(STAGE_ORDER[idx - 1]).cleared ? 'open' : 'lock';
 }
 
-/** 복습 손님 다이얼로그 (v2) */
-export function reviewDialog(root, dueIds) {
+/** 복습 손님 다이얼로그: 틀렸던 글자를 모두 보여 주고(모자라면 무작위로 채운 글자는 점선 카드), 그 글자들로 복습 탕후루를 만든다 */
+export function reviewDialog(root, demoIds) {
+  const set = demoIds ? { wrong: demoIds, extra: [] } : reviewSet();
+  const ids = set.wrong.concat(set.extra);
+  const chips = el('div.review-chips');
+  for (const id of ids) {
+    const c = BY_ID[id]; if (!c) continue;
+    chips.append(el('div.rc' + (set.wrong.includes(id) ? '' : '.extra'), {}, el('span.h', { text: c.hanja }), el('span.m', { text: displayHunEum(c) })));
+  }
+  const skewers = Math.ceil(ids.length / 5);
   const ov = el('div.overlay');
   ov.append(el('div.scrim', { onClick: () => ov.remove() }));
-  const dlg = el('div.dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 110px)' } },
+  const dlg = el('div.dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 60px)' } },
     el('div.dtitle', { html: `복습하면 젤리 ${REVIEW_BONUS}개를<br>더 받을 수 있어요!` }),
     el('div.dart', {}, img('char_owl_happy'), el('div.sparkle', { style: { left: '0', top: '40px' } }, icon.sparkle(24)), el('div.sparkle', { style: { right: '0', top: '20px', animationDelay: '300ms' } }, icon.sparkle(18))),
-    el('div.dbody', { html: `판다 손님이 잊어버린 글자 ${dueIds.length}개로<br>탕후루를 주문했어요.` }),
-    el('div.dbtn', {}, button('복습하기', '', () => go('game', { review: dueIds.slice(0, 5), bonus: true })), img('sticker_ribbon', { class: 'gift' })));
+    el('div.dbody', { html: set.wrong.length ? `판다 손님이 틀렸던 글자 ${set.wrong.length}개로<br>탕후루 ${skewers}개를 주문했어요.` : `판다 손님이 글자 ${ids.length}개로<br>탕후루를 주문했어요.` }),
+    chips,
+    el('div.dbtn', {}, button('복습하기', '', () => go('game', { review: ids, bonus: true })), img('sticker_ribbon', { class: 'gift' })));
   ov.append(dlg);
   root.append(ov);
   return ov;
@@ -123,8 +133,9 @@ registerScreen('map', (root, params = {}) => {
 
   const dueIds = box0Ids();
   if (dueIds.length >= REVIEW_THRESHOLD) {
-    const owl = el('div.owl-node', { style: { left: '292px', top: (560 + PAD) + 'px' } }, el('div.bub', { text: '복습하러 왔어요' }), img('char_owl', { class: 'float-y' }));
-    owl.addEventListener('click', () => { sfx.pop(); reviewDialog(root, dueIds); });
+    const owl = el('div.owl-node' + (tm.owlX < 196 ? '.bub-right' : ''), { 'data-tx': 'owlX', 'data-ty': 'owlY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.owlX + 'px', top: (tm.owlY + PAD) + 'px' } },   // 위치: 조정 모드 '맵'
+      el('div.owl-float', {}, el('div.speech.owl-bub', {}, el('div.line', { text: '복습하러 왔어요' })), img('char_owl')));   // 말풍선이 판다와 함께 둥실 (꼬리는 판다 쪽)
+    owl.addEventListener('click', () => { sfx.pop(); reviewDialog(root); });
     world.append(owl);
   }
   scroll.append(world);
@@ -196,6 +207,6 @@ registerScreen('map', (root, params = {}) => {
       requestAnimationFrame(step);
     }
     if (pending) playClearFx();
-    if (params.demoDialog) reviewDialog(root, dueIds.length ? dueIds : ['天', '地', '川', '海', '林']);
+    if (params.demoDialog) reviewDialog(root, reviewSet().wrong.length ? null : ['天', '地', '川', '海', '林']);
   }, 0);
 });

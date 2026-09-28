@@ -165,15 +165,30 @@ function assignModes(targetIds, modes, learned) {
 /** 복습 5문제 (복습 손님 / 도감 복습하기). ids: 출제할 글자들 */
 export function buildReview(ids) {
   const learned = learnedIds('1-5');
-  const seen = seenIds();
-  let pool = ids.slice();
-  if (pool.length < 5) {
-    const extra = reviewPriority([...seen].filter(id => !pool.includes(id)));
-    pool = pool.concat(extra).slice(0, 5);
-  }
-  while (pool.length < 5) pool.push(pick(GRADE8).id);
-  const modes = shuffle(['A', 'B', 'A', 'B', 'C']);
-  return assignModes(pool.slice(0, 5), modes, learned);
+  let pool = [...new Set(ids)];
+  if (pool.length < 5 || pool.length % 5) pool = pool.concat(reviewFill(pool, Math.max(5, Math.ceil(pool.length / 5) * 5) - pool.length));
+  const modes = [];
+  for (let i = 0; i < pool.length; i += 5) modes.push(...shuffle(['A', 'B', 'A', 'B', 'C']));   // 탕후루 하나(5문제)마다 같은 비율
+  return assignModes(pool, modes, learned);
+}
+
+/** 채우기용 글자: 본 적 있는 글자 중 무작위 (틀린 목록에 없는 것), 모자라면 8급에서 */
+function reviewFill(exclude, n) {
+  const out = [];
+  const pool = shuffle([...seenIds()].filter(id => !exclude.includes(id)));
+  for (const id of pool) { if (out.length >= n) break; out.push(id); }
+  const g8 = shuffle(GRADE8.map(c => c.id).filter(id => !exclude.includes(id) && !out.includes(id)));
+  while (out.length < n && g8.length) out.push(g8.pop());
+  return out;
+}
+
+/** 복습 손님이 가져오는 글자 (기획서 §6.2): 플레이하면서 틀렸던 글자를 모두(많이 틀린·오래된 순, 최대 15 = 탕후루 3개).
+ *  탕후루 단위(5개)가 안 차면 본 적 있는 글자를 무작위로 채운다. → { wrong: 틀린 글자, extra: 무작위로 채운 글자 } */
+export function reviewSet(max = 15) {
+  const wrongAll = Object.entries(progress.chars).filter(([, s]) => s.asked > 0 && (s.box === 0 || s.wrongCount > 0)).map(([id]) => id);
+  const wrong = reviewPriority(wrongAll).slice(0, max);
+  const total = Math.min(max, Math.max(5, Math.ceil(wrong.length / 5) * 5));
+  return { wrong, extra: reviewFill(wrong, total - wrong.length) };
 }
 
 /** box 0인 글자 (본 적 있고 한 번 이상 출제된 것) */
