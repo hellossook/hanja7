@@ -71,8 +71,7 @@ const RULES = [
   { sel: '.profile',          skin: 'profile', tints: [] },
   { sel: '.cnode.lock .clabel', skin: 'label',   tints: [['*', 'labelLock']] },   // 잠긴 노드 이름표: 회색 라벨
   { sel: '.cnode .clabel',     skin: 'xptrack', tints: [] },                     // 클리어·진행 중 노드 이름표: panel_xpbar_track
-  { sel: '.book-page .head',  skin: 'header',  tints: [['*', 'headPink']] },
-  { sel: '.book-count',       skin: 'header',  tints: [] },
+  { sel: '.book-count',       skin: 'pill',    tints: [] },   // 도감 아래 숫자: 파란 알약 (제목은 CSS 의 분홍 리본 그림)
   { sel: '.note, .splash-tip, .owl-node .bub', skin: 'mission', tints: [['.mint', 'noteMint']] },
   { sel: '.dialog, .detail, .book-page', skin: 'card', tints: [] },
   { sel: '.cell-h, .wrong-chip', skin: 'product', tints: [['.none', 'grayLight']] },

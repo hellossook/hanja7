@@ -10,46 +10,61 @@ export function applyScale() {
   const app = document.getElementById('app');
   const probe = document.getElementById('safe-probe');
   const stage = document.getElementById('stage');                      // 조정 모드 패널이 붙으면 그만큼 좁아진다
-  // 아이폰 홈 화면 앱은 innerHeight 가 실제 보이는 높이보다 클 때가 있다 → visualViewport(실제 보이는 영역)와 비교해 작은 쪽을 쓴다
-  const vv = window.visualViewport;
   const tuning = document.body.classList.contains('tuning');
+  const q = new URLSearchParams(location.search);
+  const standalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
   const vw = stage ? stage.clientWidth : window.innerWidth;
-  let vh = stage ? stage.clientHeight : window.innerHeight;
-  if (!tuning && vv && vv.height && vv.height < vh) vh = Math.floor(vv.height);
-  if (stage && !tuning) stage.style.height = vh + 'px';                  // 무대도 보이는 높이에 맞춘다 (가운데 정렬이 어긋나지 않게)
-  // 화면은 언제나 기준 크기(393×852)로 그리고, 기기에 맞춰 통째로 줄이거나 키운다 → 어떤 기기에서도 잘리지 않고 배치가 같다
-  // (사파리 주소창 때문에 세로가 짧으면 양옆에 여백이 조금 생기고, 홈 화면 앱에서는 꽉 찬다)
-  const scale = Math.min(vw / BASE_W, vh / BASE_H);
-  const h = BASE_H;
+  let vh = stage && tuning ? stage.clientHeight : window.innerHeight;
+  if (!tuning) {
+    if (standalone) {
+      // 홈 화면 앱: iOS 가 visualViewport 높이를 상태 막대만큼 작게 알려 주는 버그가 있어 쓰지 않는다. 화면 전체 높이를 쓴다
+      const sh = Math.abs(screen.width - vw) < 2 ? screen.height : 0;
+      vh = Math.max(window.innerHeight, document.documentElement.clientHeight, sh);
+    } else if (window.visualViewport && visualViewport.height && visualViewport.height < vh) {
+      vh = Math.floor(visualViewport.height);                           // 사파리 안: 주소창·도구 막대를 뺀 실제 보이는 높이
+    }
+    if (stage) stage.style.height = vh + 'px';
+  }
+  // 폭에 맞춰 키우고(393 = 화면 폭), 세로는 기기만큼 쓴다. 세로가 852 보다 짧으면(사파리 도구 막대) 852 가 다 들어가게 줄이고 양옆은 배경으로 채운다
+  let scale, h;
+  if (tuning) { scale = Math.min(vw / BASE_W, vh / BASE_H); h = BASE_H; }   // 조정 모드: 항상 기준 화면(393×852)
+  else {
+    scale = vw / BASE_W; h = vh / scale;
+    if (h < BASE_H) { scale = vh / BASE_H; h = BASE_H; }
+    else if (h > MAX_H) h = MAX_H;
+  }
+  const bleed = Math.max(0, (vw / scale - BASE_W) / 2);                   // 양옆 빈 곳 (논리 px) — 배경이 이만큼 더 넓게 깔린다
   const cs = getComputedStyle(probe);
   let st = parseFloat(cs.paddingTop) || 0, sb = parseFloat(cs.paddingBottom) || 0;
-  // 마우스로 보는 곳(맥 브라우저·스크린샷·조정 모드)에서는 아이폰 15 안전영역(위 59 · 아래 34)으로 가정한다 → 미리보기가 실제 아이폰과 같아진다.
-  // 진짜 폰(터치 기기)에서는 기기 값만 쓴다: 사파리 안에서는 0(주소창·상태 막대가 밖에 있음), 홈 화면 앱에서는 59/34
-  const q = new URLSearchParams(location.search);
+  // 마우스로 보는 곳(맥 미리보기·스크린샷·조정 모드)에서는 아이폰 15 홈 화면 앱의 안전영역(위 59 · 아래 34)으로 가정한다 → 폰과 똑같이 보인다
   const realPhone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && navigator.maxTouchPoints > 0;
-  const simulate = tuning || q.has('demo') || q.has('safe') || !realPhone;   // 조정 모드·데모(스크린샷)·맥 브라우저는 항상 아이폰 15 기준
+  const simulate = tuning || q.has('demo') || q.has('safe') || !realPhone;
   if (!st && !sb && simulate && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
-  // 앱이 화면 전체를 채울 때만 기기 안전영역이 의미 있다 (여백이 생기면 이미 안전함)
-  const fills = Math.abs(h * scale - vh) < 2 || document.body.classList.contains('tuning');
+  // 안전영역은 앱이 화면 위·아래 끝까지 닿을 때만 의미가 있다
+  const fills = Math.abs(h * scale - vh) < 2 || tuning;
   view.safeTop = Math.max(12, fills ? st / scale : 0);
   view.safeBottom = Math.max(12, fills ? sb / scale : 0);
   view.scale = scale; view.h = h;
   app.style.width = BASE_W + 'px';
   app.style.height = h + 'px';
   app.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  app.style.setProperty('--bleed', bleed.toFixed(1) + 'px');
+  document.body.classList.toggle('bleed', bleed > 0.5 && !tuning);
   const r = app.getBoundingClientRect();
   view.left = r.left; view.top = r.top;
   document.documentElement.style.setProperty('--safe-top', view.safeTop.toFixed(1) + 'px');
   document.documentElement.style.setProperty('--safe-bottom', view.safeBottom.toFixed(1) + 'px');
-  if (q.has('debug')) debugReadout(vw, vh, st, sb, scale, h);
+  // 위 안전영역이 기준(12)보다 얼마나 큰지: 위에 붙는 것들이 이만큼 내려간다
+  document.documentElement.style.setProperty('--safe-shift', (view.safeTop - 12).toFixed(1) + 'px');
+  if (q.has('debug')) debugReadout(vw, vh, st, sb, scale, h, standalone, bleed);
 }
 
 /** ?debug=1: 화면 왼쪽 아래에 수치를 보여 준다 (아이폰에서 잘림 원인을 볼 때) */
-function debugReadout(vw, vh, st, sb, scale, h) {
+function debugReadout(vw, vh, st, sb, scale, h, standalone, bleed) {
   let d = document.getElementById('dbg-readout');
   if (!d) { d = document.createElement('div'); d.id = 'dbg-readout'; d.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:9999;background:rgba(0,0,0,.7);color:#fff;font:11px/1.3 monospace;padding:4px 6px;border-radius:6px;pointer-events:none;white-space:pre'; document.body.append(d); }
   const vv = window.visualViewport;
-  d.textContent = `win ${window.innerWidth}x${window.innerHeight}  vv ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) : '-'}\nstage ${vw}x${vh}  screen ${screen.width}x${screen.height}\nsafe ${st.toFixed(0)}/${sb.toFixed(0)}  scale ${scale.toFixed(3)}  h ${h.toFixed(0)}\nstandalone ${navigator.standalone ? 'yes' : 'no'}`;
+  d.textContent = `win ${window.innerWidth}x${window.innerHeight}  vv ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) : '-'}\nstage ${vw}x${vh}  screen ${screen.width}x${screen.height}\nsafe ${st.toFixed(0)}/${sb.toFixed(0)}  scale ${scale.toFixed(3)}  h ${h.toFixed(0)}\nstandalone ${standalone ? 'yes' : 'no'}  bleed ${bleed.toFixed(0)}`;
 }
 
 /** 화면(클라이언트) 좌표 → 앱 논리 좌표 */

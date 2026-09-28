@@ -4,7 +4,7 @@ import { STAGE_BY_ID, jellyFor, starsFor, REVIEW_BONUS, COATINGS, ORDER_LINES, C
 import { buildStage, buildReview } from '../quiz.js';
 import { progress, recordAnswer, recordStage, addJelly, grantSticker, grantUnlock, unlockedCoats, addWallSticker, save } from '../core/store.js';
 import { stickerEl, randomWallSpot, VARIANT_COUNT } from '../wall.js';
-import { sfx, buzz } from '../core/audio.js';
+import { sfx, buzz, buzzOnRelease } from '../core/audio.js';
 import { logicalRect, toLogical } from '../core/scale.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { tune } from '../core/tune.js';
@@ -238,7 +238,7 @@ registerScreen('game', (root, params) => {
             slotY = r.y + slotTop(sk, S.onSkewer.length);
             ghost.innerHTML = ''; ghost.append(img(skewerImg(o.fruit)));
             Object.assign(ghost.style, { width: S.fw + 'px', height: fh + 'px', left: skX + 'px' });
-            ghost.classList.add('threaded'); sfx.stick(); buzz(20);
+            ghost.classList.add('threaded'); sfx.stick(); buzzOnRelease(20);
           }
         }
         if (mode === 'thread') {
@@ -264,7 +264,7 @@ registerScreen('game', (root, params) => {
   }
 
   function reject(t) {
-    S.attempts += 1; sfx.wrong(); buzz([40, 40, 40]);
+    S.attempts += 1; sfx.wrong(); buzzOnRelease([40, 40, 40]);
     t.classList.add('shake'); setTimeout(() => t.classList.add('dim'), 320);
     const chip = note.querySelector('.chip'); if (chip) { chip.textContent = '다시 골라보자!'; chip.classList.add('retry'); }
   }

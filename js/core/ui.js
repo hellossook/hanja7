@@ -1,5 +1,5 @@
 // 공통 UI 조각: 라우터, 요소 생성, 아이콘, v2 스티커 스타일 부품, 에셋 경로
-import { sfx } from './audio.js';
+import { sfx, buzz } from './audio.js';
 
 // 에셋 매니페스트 — PNG(@3x)로 교체할 때 여기 확장자만 바꾸면 된다.
 const ASSET_DIR = 'assets/img/';
@@ -84,7 +84,7 @@ export function toast(msg) {
 export function button(label, cls, onClick) {
   const b = el('button.btn' + (cls || '').split(' ').filter(Boolean).map(c => '.' + c).join(''));
   if (typeof label === 'string') b.textContent = label; else b.append(label);
-  b.addEventListener('click', e => { if (b.classList.contains('disabled')) return; sfx.tap(); onClick && onClick(e); });
+  b.addEventListener('click', e => { if (b.classList.contains('disabled')) return; sfx.tap(); buzz(10); onClick && onClick(e); });
   return b;
 }
 

@@ -74,25 +74,35 @@ function noiseBurst(dur, vol) {
   src.connect(f); f.connect(g); g.connect(c.destination); src.start();
 }
 
-/** 진동. 안드로이드: navigator.vibrate. 아이폰: 웹에 진동 API 가 없어서 iOS 18+ 가 <input type=checkbox switch> 를 켤 때 내는 햅틱을 빌린다
- *  (터치 이벤트 안에서 불러야 울린다. 진동 한 번 = 스위치 한 번 토글) */
-let hapticSwitch = null;
+/** 진동. 안드로이드: navigator.vibrate. 아이폰: 웹에 진동 API 가 없어서, iOS 18+ 사파리가 스위치(<input type=checkbox switch>)를 켤 때 내는
+ *  시스템 햅틱을 빌린다. 스위치를 감싼 <label> 을 click() 하면 된다 — 단, 손가락 이벤트(터치·클릭) 처리 중에 불러야 울린다.
+ *  (설정 → 소리 및 햅틱 → 시스템 햅틱 이 켜져 있어야 한다) */
 function iosHaptic() {
-  if (!hapticSwitch) {
-    const lab = document.createElement('label');
-    lab.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;overflow:hidden;pointer-events:none;z-index:-1';
-    hapticSwitch = document.createElement('input'); hapticSwitch.type = 'checkbox'; hapticSwitch.setAttribute('switch', '');
-    lab.append(hapticSwitch); document.body.append(lab);
-  }
-  hapticSwitch.click();
+  const label = document.createElement('label');
+  label.setAttribute('aria-hidden', 'true');
+  label.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'checkbox'; input.setAttribute('switch', '');
+  label.appendChild(input);
+  document.head.appendChild(label);
+  label.click();
+  document.head.removeChild(label);
 }
 export function buzz(ms = 15) {
   try {
     if (navigator.vibrate) { navigator.vibrate(ms); return; }
-    const strong = Array.isArray(ms) ? ms.length : (ms >= 30 ? 2 : 1);
-    for (let i = 0; i < strong; i++) setTimeout(iosHaptic, i * 70);
+    iosHaptic();
   } catch (e) { /* 지원 안 함 */ }
 }
+/** 끌고 있는 중(손가락 이동 중)에 난 진동: 아이폰은 이동 중에는 햅틱을 못 내므로 손을 떼는 순간에 울린다. 안드로이드는 바로 */
+let hapticDue = false;
+export function buzzOnRelease(ms = 15) {
+  if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { /* 없음 */ } return; }
+  hapticDue = true;
+}
+const fireDue = () => { if (hapticDue) { hapticDue = false; try { iosHaptic(); } catch (e) { /* 없음 */ } } };
+window.addEventListener('touchend', fireDue, true);
+window.addEventListener('pointerup', fireDue, true);
 
 // ---------- 배경 음악: 파일 없이 WebAudio 로 연주하는 8마디 루프 (잔잔하고 경쾌하게, 다장조 112 BPM) ----------
 const BPM = 112, STEP = 60 / BPM / 2;   // 8분음표 하나의 길이 (초)

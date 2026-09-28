@@ -700,3 +700,23 @@ body.tuning .sbar { cursor: ns-resize; }
 .dialog.rename { padding-top: 26px; }
 .dialog .dbtn.two { display: flex; gap: 10px; width: 100%; justify-content: center; }
 .dialog .dbtn.two .btn { min-width: 110px; }
+
+/* ---------- 47. 화면 맞춤: 사파리 안에서 세로가 짧아 양옆이 비면 배경만 옆으로 넓게 깐다 ---------- */
+body.bleed #stage { overflow: hidden; }
+body.bleed #app { overflow: visible; }
+body.bleed .screen::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: inherit; z-index: -2; pointer-events: none; }
+body.bleed .map-scroll { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
+body.bleed .map-world { margin-left: var(--bleed); }
+body.bleed .map-world::before { content: ''; position: absolute; top: 200px; height: 1180px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: url('../assets/ui/map/bg_map_candy.jpg') center top / 100% 100%; filter: blur(6px) saturate(1.05); opacity: 0.9; }
+body.bleed .bg-layer { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
+body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
+
+/* 스티커 상자 칸: 세로 스크롤 허용 (집을 때만 스크립트가 막는다) · 집으면 살짝 들림 */
+#app .tchip { touch-action: pan-y; }
+.tchip.lift .box { transform: scale(1.06); transition: transform 120ms; }
+
+/* ---------- 48. 도감: 제목 리본 · 숫자 알약 (글씨는 리본·버튼처럼 흰 글씨 + 색 외곽선) ---------- */
+#app .book-page .head { width: 236px; height: 63px; top: -34px; padding: 0 0 8px; justify-content: center; background: url('../assets/ui/panel/panel_ribbon_pink.png') center / 100% 100% no-repeat !important; border: none; box-shadow: none; border-radius: 0;
+  font-family: var(--jua); font-size: 23px; color: #fff; text-shadow: none; -webkit-text-stroke: 6px #D6457A; paint-order: stroke fill; transform: translateX(-50%); }
+#app .book-count { min-width: 104px; height: 38px; bottom: -19px; padding: 0 22px 2px; justify-content: center; border: none; box-shadow: none; background-color: transparent;
+  font-family: var(--jua); font-size: 18px; color: #fff; text-shadow: none; -webkit-text-stroke: 5px #2F6FC0; paint-order: stroke fill; }

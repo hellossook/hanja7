@@ -3,9 +3,9 @@ import { el, img, icon, go, registerScreen, pill, faceBadge, backBtn, toast } fr
 import { tune } from '../core/tune.js';
 import { progress, save, addWallSticker, removeWallSticker, stageState } from '../core/store.js';
 import { STAGES, STAGE_CHARS } from '../data/stages.js';
-import { toLogical, logicalRect } from '../core/scale.js';
+import { toLogical, logicalRect, view } from '../core/scale.js';
 import { renderWall, stickerEl, stickerName, baseSize } from '../wall.js';
-import { sfx } from '../core/audio.js';
+import { sfx, buzz } from '../core/audio.js';
 
 let filter = 'all';   // all | char | hanja
 let page = 0;
@@ -32,7 +32,7 @@ registerScreen('stickers', (root, params = {}) => {
   root.append(el('div.topbar', { style: { position: 'absolute', left: 0, right: 0, top: 0, zIndex: 6 } },
     el('div', {}, backBtn(() => go('map'), 50)), el('div'), el('div', {}, pill(icon.sticker(24), '', 'sticker'))));
   const countPill = root.querySelector('.topbar .pill .txt');
-  const panel = el('div.pink-panel', { 'data-ty': 'panelTop', 'data-tmode': 'plain', style: { top: T.panelTop + 'px' } });
+  const panel = el('div.pink-panel', { 'data-ty': 'panelTop', 'data-tmode': 'plain', 'data-toff': Math.round(view.safeTop - 12), style: { top: `calc(var(--safe-shift, 0px) + ${T.panelTop}px)` } });   // 책이 안전영역만큼 내려가면 상자도 같이
   const ptabs = el('div.ptabs');
   const grid = el('div.pgrid', { style: { columnGap: T.gridGapX + 'px', rowGap: T.gridGapY + 'px' } });
   grid.style.setProperty('--cell', T.cellSize + 'px');
@@ -236,17 +236,26 @@ registerScreen('stickers', (root, params = {}) => {
     });
   }
   function attachDrag(node, inst, from) {
-    let ghost = null, start = null, moved = false;
+    let ghost = null, start = null, moved = false, held = false, holdT = null, scrolling = false;
+    const tray = from === 'tray';
+    // 상자 칸은 세로로 쓸면 목록이 스크롤된다. 옆(또는 위 책 쪽 대각선)으로 끌거나, 0.2초 누르고 있다가 끌면 스티커를 집는다
+    if (tray) node.addEventListener('touchmove', e => { if (moved || held) e.preventDefault(); }, { passive: false });
     node.addEventListener('pointerdown', e => {
-      e.preventDefault(); e.stopPropagation();
-      start = { x: e.clientX, y: e.clientY }; moved = false;
-      try { node.setPointerCapture(e.pointerId); } catch (err) { /* 합성 이벤트 */ }
+      if (!tray) e.preventDefault();
+      e.stopPropagation();
+      start = { x: e.clientX, y: e.clientY, t: performance.now() }; moved = false; held = false; scrolling = false;
+      clearTimeout(holdT);
+      if (tray) holdT = setTimeout(() => { if (start && !moved && !scrolling) { held = true; node.classList.add('lift'); buzz(10); } }, 200);
+      if (!tray || e.pointerType === 'mouse') { try { node.setPointerCapture(e.pointerId); } catch (err) { /* 합성 이벤트 */ } }
     });
     node.addEventListener('pointermove', e => {
-      if (!start) return;
+      if (!start || scrolling) return;
       const dx = e.clientX - start.x, dy = e.clientY - start.y;
       if (!moved && Math.hypot(dx, dy) < 8) return;
+      if (!moved && tray && !held && e.pointerType !== 'mouse' && Math.abs(dy) > Math.abs(dx) * 1.2) { scrolling = true; clearTimeout(holdT); return; }   // 세로 = 스크롤
       if (!moved) {
+        clearTimeout(holdT);
+        try { node.setPointerCapture(e.pointerId); } catch (err) { /* 합성 이벤트 */ }
         moved = true; sfx.tap();
         const size = baseSize(inst) * (inst.scale || 1) * 1.15;
         ghost = el('div.drag-ghost', { style: { width: size + 'px', height: size + 'px', marginLeft: (-size / 2) + 'px', marginTop: (-size / 2) + 'px' } }, stickerEl(inst, size));
@@ -257,8 +266,10 @@ registerScreen('stickers', (root, params = {}) => {
       ghost.style.left = p.x + 'px'; ghost.style.top = p.y + 'px';
     });
     const end = e => {
+      clearTimeout(holdT); node.classList.remove('lift');
       if (!start) return;
-      const wasMoved = moved; start = null;
+      if (scrolling) { start = null; scrolling = false; return; }
+      const wasMoved = moved; start = null; held = false;
       if (!wasMoved) { if (from === 'wall') { selected = selected === inst.uid ? null : inst.uid; sfx.pop(); renderAll(); } return; }
       moved = false; sx = null;
       if (ghost) { ghost.remove(); ghost = null; }
