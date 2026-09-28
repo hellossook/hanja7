@@ -1,6 +1,6 @@
 // 뷰포트 스케일: 폭 393 논리 px 고정, 높이는 640~1000 사이에서 유동. 안전영역은 기기값을 읽어 CSS 변수로 전달.
-export const BASE_W = 393;
-export const MIN_H = 640;
+export const BASE_W = 393, BASE_H = 852;   // 아이폰 15 논리 크기 = 디자인 기준
+export const MIN_H = 640;                  // (예전 값, 지금은 안 씀)
 export const MAX_H = 1000;
 export const SIM_SAFE_TOP = 59, SIM_SAFE_BOTTOM = 34;   // 아이폰 15 (다이내믹 아일랜드 · 홈 바)
 
@@ -17,18 +17,18 @@ export function applyScale() {
   let vh = stage ? stage.clientHeight : window.innerHeight;
   if (!tuning && vv && vv.height && vv.height < vh) vh = Math.floor(vv.height);
   if (stage && !tuning) stage.style.height = vh + 'px';                  // 무대도 보이는 높이에 맞춘다 (가운데 정렬이 어긋나지 않게)
-  let scale = vw / BASE_W;
-  let h = vh / scale;
-  if (document.body.classList.contains('tuning')) {       // 조정 모드: 항상 기준 화면(393×852)으로 보여 준다 → 조정한 값이 스크린샷과 같다
-    scale = Math.min(vw / BASE_W, vh / 852); h = 852;
-  }
-  else if (h < MIN_H) { scale = vh / MIN_H; h = MIN_H; }      // 넓은 화면(iPad 등): 양옆 여백
-  else if (h > MAX_H) { h = MAX_H; }                          // 아주 긴 화면: 위아래 여백
+  // 화면은 언제나 기준 크기(393×852)로 그리고, 기기에 맞춰 통째로 줄이거나 키운다 → 어떤 기기에서도 잘리지 않고 배치가 같다
+  // (사파리 주소창 때문에 세로가 짧으면 양옆에 여백이 조금 생기고, 홈 화면 앱에서는 꽉 찬다)
+  const scale = Math.min(vw / BASE_W, vh / BASE_H);
+  const h = BASE_H;
   const cs = getComputedStyle(probe);
   let st = parseFloat(cs.paddingTop) || 0, sb = parseFloat(cs.paddingBottom) || 0;
-  // 기기 안전영역이 없는 곳(맥 브라우저·스크린샷·조정 모드)에서는 아이폰 15 값(위 59 · 아래 34)으로 가정한다 → 미리보기가 실제 아이폰과 같아진다
+  // 마우스로 보는 곳(맥 브라우저·스크린샷·조정 모드)에서는 아이폰 15 안전영역(위 59 · 아래 34)으로 가정한다 → 미리보기가 실제 아이폰과 같아진다.
+  // 진짜 폰(터치 기기)에서는 기기 값만 쓴다: 사파리 안에서는 0(주소창·상태 막대가 밖에 있음), 홈 화면 앱에서는 59/34
   const q = new URLSearchParams(location.search);
-  if (!st && !sb && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
+  const realPhone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && navigator.maxTouchPoints > 0;
+  const simulate = tuning || q.has('demo') || q.has('safe') || !realPhone;   // 조정 모드·데모(스크린샷)·맥 브라우저는 항상 아이폰 15 기준
+  if (!st && !sb && simulate && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
   // 앱이 화면 전체를 채울 때만 기기 안전영역이 의미 있다 (여백이 생기면 이미 안전함)
   const fills = Math.abs(h * scale - vh) < 2 || document.body.classList.contains('tuning');
   view.safeTop = Math.max(12, fills ? st / scale : 0);
