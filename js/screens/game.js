@@ -388,17 +388,19 @@ registerScreen('game', (root, params) => {
     sfx.jelly();
     // 다른 손님들의 한마디
     const others = shuffle(Object.keys(CHAT_LINES).filter(c => c !== customer && c !== 'owl')).slice(0, 3);
-    const list = el('div.chat-list', { style: { bottom: 'calc(var(--safe-bottom) + 104px)' } });   // 아래 버튼 위에 붙인다 (안전영역이 커도 안 겹친다)
+    // 아래 버튼 위에 붙인다 (안전영역이 커도 안 겹친다). 마지막 탕후루면 '모두 판매했어요' 문구 자리만큼 올리고 채팅을 조금 촘촘하게
+    const lastSale = S.qi >= questions.length;
+    const list = el('div.chat-list' + (lastSale ? '.tight' : ''), { style: { bottom: `calc(var(--safe-bottom) + ${lastSale ? 138 : 104}px)` } });
     L.append(list);
     for (let i = 0; i < others.length; i++) {
       await wait(260);
-      list.append(el('div.chat-item', {}, faceBadge(others[i], 58), el('div.msg', { text: pick(CHAT_LINES[others[i]]) })));
+      list.append(el('div.chat-item', {}, faceBadge(others[i], lastSale ? 52 : 58), el('div.msg', { text: pick(CHAT_LINES[others[i]]) })));
     }
     await stickCustomerSticker(L, custEl);
     S.last = { fruits: S.onSkewer.slice(), coat: S.coat };
     S.made.push(S.last);                                        // 이 스테이지에서 만든 탕후루 (결과 화면에 전부)
     const last = S.qi >= questions.length;
-    if (last) L.append(el('div.done-bubble.plain.pop-in', {}, el('div.done-text', { text: isReview ? '새콤달콤 복습 탕후루를 다 팔았어요!' : `새콤달콤 탕후루 ${skewerCount}개 모두 판매했어요!` })));
+    if (last) L.append(el('div.done-bubble.plain.sale-done.pop-in', {}, el('div.done-text', { text: isReview ? '새콤달콤 복습 탕후루를 다 팔았어요!' : `새콤달콤 탕후루 ${skewerCount}개 모두 판매했어요!` })));
     const cta = el('div.sale-cta.rise-in', {}, button(last ? '결과 보기' : '다음 탕후루', last ? 'yellow' : '', () => last ? finish() : nextTanghulu()));
     L.append(cta);
   }
@@ -459,9 +461,10 @@ registerScreen('game', (root, params) => {
     layout();
     if (state === 'toast') { showOrder(0, true); return; }
     if (state === 'full') { S.onSkewer = ['strawberry', 'tangerine', 'grape', 'blueberry', 'kiwi']; layout(); renderQuestion(); return; }
-    if (['jars', 'stir', 'done', 'sale', 'sticker'].includes(state)) {
+    if (['jars', 'stir', 'done', 'sale', 'salelast', 'sticker'].includes(state)) {
       S.onSkewer = ['strawberry', 'tangerine', 'grape', 'blueberry', 'kiwi']; S.firstTry5 = 4;
       layout(); renderQuestion();
+      if (state === 'salelast') S.qi = questions.length;               // 마지막 탕후루 판매 (모두 판매했어요 문구)
       if (state === 'jars') return startCoating();
       if (state === 'stir') return startStir('choco');
       S.coat = 'choco';

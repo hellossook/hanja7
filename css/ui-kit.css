@@ -743,3 +743,19 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 /* 버튼 글씨: 버튼 윗면(아래 입체 테두리 제외)의 세로 가운데 */
 #app .btn { padding: 2px 30px 3px; }
 #app .btn.small { padding: 2px 26px 3px; }
+
+/* 판매: 마지막 탕후루의 '모두 판매했어요' 문구는 채팅과 버튼 사이 (채팅은 그만큼 위로, 조금 촘촘하게) */
+.chat-list.tight { gap: 2px; }
+.chat-list.tight .chat-item .msg { padding-top: 8px; padding-bottom: 10px; }
+.done-bubble.plain.sale-done { bottom: calc(var(--safe-bottom) + 100px); left: 10px; right: 10px; }
+.done-bubble.plain.sale-done .done-text { font-size: 21px; white-space: nowrap; letter-spacing: -0.3px; }
+/* ---------- 50. 다음 가게 열림: 회색 알 → 과일 알 자연스럽게 (겹쳐서 스르르 바뀌고, 자물쇠는 톡 튀어 사라짐) ---------- */
+.unlock-ov.go { animation: none; }
+.unlock-ov.go .ball { animation: gray-out 900ms ease-in-out 250ms forwards; }
+@keyframes gray-out { 0% { opacity: 1; filter: brightness(1) drop-shadow(0 4px 3px rgba(90,62,43,0.25)); } 45% { filter: brightness(1.35) drop-shadow(0 0 10px #fff); } 100% { opacity: 0; filter: brightness(1.5) drop-shadow(0 0 14px #fff); } }
+.unlock-ov.go .lockico { animation: lock-pop 700ms cubic-bezier(.3, 0, .6, 1) forwards; }
+@keyframes lock-pop { 0% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; } 25% { transform: translate(-50%, -62%) scale(1.15) rotate(-8deg); opacity: 1; } 100% { transform: translate(-10%, -170%) scale(0.6) rotate(24deg); opacity: 0; } }
+.cnode.born .ball { animation: fruit-in 1000ms ease-out 250ms both, node-boing 1100ms ease-in-out 1500ms infinite, cnode-glow 1400ms ease-in-out 1500ms infinite; transform-origin: 50% 90%; }
+@keyframes fruit-in { 0% { opacity: 0; transform: scale(0.94); filter: brightness(1.6) saturate(0.2) drop-shadow(0 0 14px #fff); } 55% { opacity: 1; transform: scale(1.06, 0.97); filter: brightness(1.2) saturate(0.8) drop-shadow(0 0 12px #FFE27A); } 100% { opacity: 1; transform: scale(1); filter: brightness(1) saturate(1) drop-shadow(0 4px 3px rgba(90,62,43,0.25)); } }
+.cnode.born .cface .face-badge { transition: box-shadow 700ms ease 400ms; }
+.cnode .clabel { transition: color 600ms ease; }

@@ -1,5 +1,5 @@
 // 뷰포트 스케일: 폭 393 논리 px 고정, 높이는 640~1000 사이에서 유동. 안전영역은 기기값을 읽어 CSS 변수로 전달.
-export const BUILD = '6ff15dcfb4';          // tools/build_pwa.py 가 배포 때 버전으로 바꾼다
+export const BUILD = '7e0215110f';          // tools/build_pwa.py 가 배포 때 버전으로 바꾼다
 export const BASE_W = 393, BASE_H = 852;   // 아이폰 15 논리 크기 = 디자인 기준
 export const MIN_H = 640;                  // (예전 값, 지금은 안 씀)
 export const MAX_H = 1000;
