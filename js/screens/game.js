@@ -381,7 +381,7 @@ registerScreen('game', (root, params) => {
     sfx.jelly();
     // 다른 손님들의 한마디
     const others = shuffle(Object.keys(CHAT_LINES).filter(c => c !== customer && c !== 'owl')).slice(0, 3);
-    const list = el('div.chat-list', { style: { top: 'calc(var(--safe-top) + 490px)' } });
+    const list = el('div.chat-list', { style: { bottom: 'calc(var(--safe-bottom) + 104px)' } });   // 아래 버튼 위에 붙인다 (안전영역이 커도 안 겹친다)
     L.append(list);
     for (let i = 0; i < others.length; i++) {
       await wait(260);
