@@ -10,7 +10,13 @@ export function applyScale() {
   const app = document.getElementById('app');
   const probe = document.getElementById('safe-probe');
   const stage = document.getElementById('stage');                      // 조정 모드 패널이 붙으면 그만큼 좁아진다
-  const vw = stage ? stage.clientWidth : window.innerWidth, vh = stage ? stage.clientHeight : window.innerHeight;
+  // 아이폰 홈 화면 앱은 innerHeight 가 실제 보이는 높이보다 클 때가 있다 → visualViewport(실제 보이는 영역)와 비교해 작은 쪽을 쓴다
+  const vv = window.visualViewport;
+  const tuning = document.body.classList.contains('tuning');
+  const vw = stage ? stage.clientWidth : window.innerWidth;
+  let vh = stage ? stage.clientHeight : window.innerHeight;
+  if (!tuning && vv && vv.height && vv.height < vh) vh = Math.floor(vv.height);
+  if (stage && !tuning) stage.style.height = vh + 'px';                  // 무대도 보이는 높이에 맞춘다 (가운데 정렬이 어긋나지 않게)
   let scale = vw / BASE_W;
   let h = vh / scale;
   if (document.body.classList.contains('tuning')) {       // 조정 모드: 항상 기준 화면(393×852)으로 보여 준다 → 조정한 값이 스크린샷과 같다
@@ -35,6 +41,15 @@ export function applyScale() {
   view.left = r.left; view.top = r.top;
   document.documentElement.style.setProperty('--safe-top', view.safeTop.toFixed(1) + 'px');
   document.documentElement.style.setProperty('--safe-bottom', view.safeBottom.toFixed(1) + 'px');
+  if (q.has('debug')) debugReadout(vw, vh, st, sb, scale, h);
+}
+
+/** ?debug=1: 화면 왼쪽 아래에 수치를 보여 준다 (아이폰에서 잘림 원인을 볼 때) */
+function debugReadout(vw, vh, st, sb, scale, h) {
+  let d = document.getElementById('dbg-readout');
+  if (!d) { d = document.createElement('div'); d.id = 'dbg-readout'; d.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:9999;background:rgba(0,0,0,.7);color:#fff;font:11px/1.3 monospace;padding:4px 6px;border-radius:6px;pointer-events:none;white-space:pre'; document.body.append(d); }
+  const vv = window.visualViewport;
+  d.textContent = `win ${window.innerWidth}x${window.innerHeight}  vv ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) : '-'}\nstage ${vw}x${vh}  screen ${screen.width}x${screen.height}\nsafe ${st.toFixed(0)}/${sb.toFixed(0)}  scale ${scale.toFixed(3)}  h ${h.toFixed(0)}\nstandalone ${navigator.standalone ? 'yes' : 'no'}`;
 }
 
 /** 화면(클라이언트) 좌표 → 앱 논리 좌표 */
@@ -52,4 +67,7 @@ export function initScale() {
   applyScale();
   window.addEventListener('resize', applyScale);
   window.addEventListener('orientationchange', () => setTimeout(applyScale, 120));
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', applyScale);
+  window.addEventListener('pageshow', applyScale);
+  [150, 500, 1200, 2500].forEach(ms => setTimeout(applyScale, ms));      // 홈 화면 앱은 처음 몇 백 ms 동안 뷰포트 값이 바뀐다
 }

@@ -74,8 +74,25 @@ function noiseBurst(dur, vol) {
   src.connect(f); f.connect(g); g.connect(c.destination); src.start();
 }
 
-/** 진동 (안드로이드 크롬 등 지원하는 기기에서만. 아이폰 사파리는 웹에서 진동을 막아 두어 아무 일도 안 일어난다) */
-export function buzz(ms = 15) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* 지원 안 함 */ } }
+/** 진동. 안드로이드: navigator.vibrate. 아이폰: 웹에 진동 API 가 없어서 iOS 18+ 가 <input type=checkbox switch> 를 켤 때 내는 햅틱을 빌린다
+ *  (터치 이벤트 안에서 불러야 울린다. 진동 한 번 = 스위치 한 번 토글) */
+let hapticSwitch = null;
+function iosHaptic() {
+  if (!hapticSwitch) {
+    const lab = document.createElement('label');
+    lab.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;overflow:hidden;pointer-events:none;z-index:-1';
+    hapticSwitch = document.createElement('input'); hapticSwitch.type = 'checkbox'; hapticSwitch.setAttribute('switch', '');
+    lab.append(hapticSwitch); document.body.append(lab);
+  }
+  hapticSwitch.click();
+}
+export function buzz(ms = 15) {
+  try {
+    if (navigator.vibrate) { navigator.vibrate(ms); return; }
+    const strong = Array.isArray(ms) ? ms.length : (ms >= 30 ? 2 : 1);
+    for (let i = 0; i < strong; i++) setTimeout(iosHaptic, i * 70);
+  } catch (e) { /* 지원 안 함 */ }
+}
 
 // ---------- 배경 음악: 파일 없이 WebAudio 로 연주하는 8마디 루프 (잔잔하고 경쾌하게, 다장조 112 BPM) ----------
 const BPM = 112, STEP = 60 / BPM / 2;   // 8분음표 하나의 길이 (초)
