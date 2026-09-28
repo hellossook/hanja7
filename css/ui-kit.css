@@ -763,3 +763,6 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .owl-node .speech.owl-bub { --tail-x: 104px; }
 .owl-node .speech.owl-bub::after { transform: scaleX(-1); }
 .owl-node.bub-right .speech.owl-bub::after { transform: none; }
+/* 복습 손님 말풍선: 오른쪽으로 12px, 글씨는 조금 아래로 (높이는 그대로) */
+.owl-node .speech.owl-bub { left: -84px; padding-top: 16px; padding-bottom: 26px; }
+.owl-node.bub-right .speech.owl-bub { left: 50px; }
