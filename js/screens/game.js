@@ -384,7 +384,7 @@ registerScreen('game', (root, params) => {
     addJelly(jelly); save();
     L.querySelector('.pills .txt').textContent = String(progress.jelly);
     jellyCount.textContent = String(progress.jelly);
-    L.append(el('div.sale-jelly.pop-in', { style: { top: 'calc(var(--ct) + 448px)' } }, pill(img('jelly'), `+ 젤리 ${jelly}`)));
+    L.append(el('div.sale-jelly.pop-in', { style: { top: 'auto', bottom: 'calc(var(--safe-bottom) + 326px)' } }, pill(img('jelly'), `+ 젤리 ${jelly}`)));   // 손님 채팅(최대 3줄) 바로 위 — 채팅과 안 겹친다
     sfx.jelly();
     // 다른 손님들의 한마디
     const others = shuffle(Object.keys(CHAT_LINES).filter(c => c !== customer && c !== 'owl')).slice(0, 3);
