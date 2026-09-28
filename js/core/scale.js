@@ -1,4 +1,5 @@
 // 뷰포트 스케일: 폭 393 논리 px 고정, 높이는 640~1000 사이에서 유동. 안전영역은 기기값을 읽어 CSS 변수로 전달.
+export const BUILD = '6ac1109d0c';          // tools/build_pwa.py 가 배포 때 버전으로 바꾼다
 export const BASE_W = 393, BASE_H = 852;   // 아이폰 15 논리 크기 = 디자인 기준
 export const MIN_H = 640;                  // (예전 값, 지금은 안 씀)
 export const MAX_H = 1000;
@@ -17,8 +18,10 @@ export function applyScale() {
   let vh = stage && tuning ? stage.clientHeight : window.innerHeight;
   if (!tuning) {
     if (standalone) {
-      // 홈 화면 앱: iOS 가 visualViewport 높이를 상태 막대만큼 작게 알려 주는 버그가 있어 쓰지 않는다. 화면 전체 높이를 쓴다
-      const sh = Math.abs(screen.width - vw) < 2 ? screen.height : 0;
+      // 홈 화면 앱: iOS 26 은 페이지를 상태 막대 밑까지 끌어올리면서 높이(innerHeight)는 상태 막대만큼 작게 알려 준다 → 아래 59px 가 비었다.
+      // 화면 전체 높이(screen.height)를 쓰고, 무대 높이도 그만큼 직접 지정한다
+      const portrait = vw <= screen.width + 1;
+      const sh = portrait ? screen.height : screen.width;
       vh = Math.max(window.innerHeight, document.documentElement.clientHeight, sh);
     } else if (window.visualViewport && visualViewport.height && visualViewport.height < vh) {
       vh = Math.floor(visualViewport.height);                           // 사파리 안: 주소창·도구 막대를 뺀 실제 보이는 높이
@@ -56,15 +59,25 @@ export function applyScale() {
   document.documentElement.style.setProperty('--safe-bottom', view.safeBottom.toFixed(1) + 'px');
   // 위 안전영역이 기준(12)보다 얼마나 큰지: 위에 붙는 것들이 이만큼 내려간다
   document.documentElement.style.setProperty('--safe-shift', (view.safeTop - 12).toFixed(1) + 'px');
-  if (q.has('debug')) debugReadout(vw, vh, st, sb, scale, h, standalone, bleed);
+  document.documentElement.classList.toggle('standalone', standalone);
+  if (q.has('debug') || debugOn) debugReadout(vw, vh, st, sb, scale, h, standalone, bleed);
+  else document.getElementById('dbg-readout')?.remove();
 }
 
 /** ?debug=1: 화면 왼쪽 아래에 수치를 보여 준다 (아이폰에서 잘림 원인을 볼 때) */
+let debugOn = false;
+/** 화면 왼쪽 위 구석을 1.5초 안에 5번 누르면 수치 표시를 켜고 끈다 (홈 화면 앱에서는 주소에 ?debug=1 을 못 붙여서) */
+let taps = [];
+window.addEventListener('pointerdown', e => {
+  if (e.clientX > 60 || e.clientY > 60) return;
+  const now = performance.now(); taps = taps.filter(t => now - t < 1500); taps.push(now);
+  if (taps.length >= 5) { taps = []; debugOn = !debugOn; applyScale(); }
+}, true);
 function debugReadout(vw, vh, st, sb, scale, h, standalone, bleed) {
   let d = document.getElementById('dbg-readout');
   if (!d) { d = document.createElement('div'); d.id = 'dbg-readout'; d.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:9999;background:rgba(0,0,0,.7);color:#fff;font:11px/1.3 monospace;padding:4px 6px;border-radius:6px;pointer-events:none;white-space:pre'; document.body.append(d); }
   const vv = window.visualViewport;
-  d.textContent = `win ${window.innerWidth}x${window.innerHeight}  vv ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) : '-'}\nstage ${vw}x${vh}  screen ${screen.width}x${screen.height}\nsafe ${st.toFixed(0)}/${sb.toFixed(0)}  scale ${scale.toFixed(3)}  h ${h.toFixed(0)}\nstandalone ${standalone ? 'yes' : 'no'}  bleed ${bleed.toFixed(0)}`;
+  d.textContent = `win ${window.innerWidth}x${window.innerHeight}  vv ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) : '-'}\nstage ${vw}x${vh}  screen ${screen.width}x${screen.height}\nsafe ${st.toFixed(0)}/${sb.toFixed(0)}  scale ${scale.toFixed(3)}  h ${h.toFixed(0)}\nstandalone ${standalone ? 'yes' : 'no'}  bleed ${bleed.toFixed(0)}\nbuild ${BUILD}  app ${Math.round(document.getElementById('app').getBoundingClientRect().height)}px`;
 }
 
 /** 화면(클라이언트) 좌표 → 앱 논리 좌표 */

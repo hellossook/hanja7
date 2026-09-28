@@ -12,7 +12,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; background: #F3E4D4; overflow: hidden; overscroll-behavior: none; }
 body { font-family: var(--body); color: var(--ink); -webkit-user-select: none; user-select: none; touch-action: none; }
-#stage { position: fixed; inset: 0; background: #F3E4D4 radial-gradient(circle at 50% 30%, #FFF0E0 0%, #F3E4D4 70%); }
+#stage { position: fixed; left: 0; right: 0; top: 0; height: 100%; background: #F3E4D4 radial-gradient(circle at 50% 30%, #FFF0E0 0%, #F3E4D4 70%); }
 #app { position: absolute; left: 50%; top: 50%; width: 393px; height: 852px; transform-origin: center center; background: var(--cream); overflow: hidden; box-shadow: 0 0 0 1px rgba(58,46,57,0.06); }
 #safe-probe { position: fixed; top: 0; left: 0; width: 1px; height: 1px; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); visibility: hidden; pointer-events: none; }
 img { -webkit-user-drag: none; user-select: none; pointer-events: none; }

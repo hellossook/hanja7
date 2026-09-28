@@ -715,8 +715,8 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 #app .tchip { touch-action: pan-y; }
 .tchip.lift .box { transform: scale(1.06); transition: transform 120ms; }
 
-/* ---------- 48. 도감: 제목 리본 · 숫자 알약 (글씨는 리본·버튼처럼 흰 글씨 + 색 외곽선) ---------- */
-#app .book-page .head { width: 236px; height: 63px; top: -34px; padding: 0 0 8px; justify-content: center; background: url('../assets/ui/panel/panel_ribbon_pink.png') center / 100% 100% no-repeat !important; border: none; box-shadow: none; border-radius: 0;
-  font-family: var(--jua); font-size: 23px; color: #fff; text-shadow: none; -webkit-text-stroke: 6px #D6457A; paint-order: stroke fill; transform: translateX(-50%); }
-#app .book-count { min-width: 104px; height: 38px; bottom: -19px; padding: 0 22px 2px; justify-content: center; border: none; box-shadow: none; background-color: transparent;
-  font-family: var(--jua); font-size: 18px; color: #fff; text-shadow: none; -webkit-text-stroke: 5px #2F6FC0; paint-order: stroke fill; }
+/* ---------- 48. 도감: 제목 · 숫자 = 헤더 알약(panel_header_pill, 제목은 분홍으로 물들임). 글씨는 리본·버튼처럼 흰 글씨 + 색 외곽선 ---------- */
+#app .book-page .head { width: auto; height: 46px; top: -23px; padding: 0 30px 3px; justify-content: center; border: none; box-shadow: none; border-radius: 0; background-color: transparent;
+  font-family: var(--jua); font-size: 22px; color: #fff; text-shadow: none; -webkit-text-stroke: 5px #D6457A; paint-order: stroke fill; transform: translateX(-50%); }
+#app .book-count { min-width: 0; height: 38px; bottom: -19px; padding: 0 24px 2px; justify-content: center; border: none; box-shadow: none; background-color: transparent;
+  font-family: var(--jua); font-size: 18px; color: #fff; text-shadow: none; -webkit-text-stroke: 5px #2F7CC8; paint-order: stroke fill; }

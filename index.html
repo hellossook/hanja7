@@ -25,7 +25,12 @@
     // PWA: 배포된 곳(아이폰 홈 화면 앱)에서만 서비스 워커를 켠다. 개발 미리보기(localhost)는 ?pwa=1 을 붙였을 때만
     if ('serviceWorker' in navigator) {
       const local = ['localhost', '127.0.0.1'].includes(location.hostname), q = new URLSearchParams(location.search);
-      if ((!local || q.has('pwa')) && !q.has('tune')) navigator.serviceWorker.register('sw.js');
+      if ((!local || q.has('pwa')) && !q.has('tune')) {
+        const had = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.register('sw.js').then(r => r.update());
+        let reloaded = false;   // 새 버전이 자리를 잡으면 한 번 새로 읽는다 (처음 설치 때는 안 함)
+        navigator.serviceWorker.addEventListener('controllerchange', () => { if (had && !reloaded) { reloaded = true; location.reload(); } });
+      }
     }
   </script>
 </body>
