@@ -766,5 +766,6 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 /* 복습 손님 말풍선: 오른쪽으로 12px, 글씨는 조금 아래로 (높이는 그대로) */
 .owl-node .speech.owl-bub { left: -84px; padding-top: 16px; padding-bottom: 26px; }
 .owl-node.bub-right .speech.owl-bub { left: 50px; }
-/* 복습 손님 말풍선: 글씨는 꼬리 위쪽 몸통 가운데에 (꼬리 그림과 안 겹치게) */
-.owl-node .speech.owl-bub { padding-top: 7px; padding-bottom: 35px; }
+/* 복습 손님 말풍선: 글씨는 몸통(꼬리 뺀 부분, 위 2px~아래 13px 은 그림의 빈 여백)의 세로 가운데. 꼬리 그림은 글씨 뒤로 */
+.owl-node .speech.owl-bub { padding-top: 15px; padding-bottom: 27px; }
+.owl-node .speech.owl-bub .line { position: relative; z-index: 1; }
