@@ -20,19 +20,19 @@ registerScreen('stickers', (root, params = {}) => {
   const T = tune().stickers;
   const top = el('div.wall-box', { style: { top: 0, bottom: 0, height: 'auto' } });   // 배경은 화면 전체
   const bookH = Math.round(T.bookW / NB_RATIO);
-  const book = el('div.nb-book', { 'data-tx': 'bookX', 'data-ty': 'bookY', 'data-tmode': 'center', style: { left: `calc(50% + ${T.bookX}px)`, top: `calc(var(--safe-top) + ${T.bookY}px)`, width: T.bookW + 'px', height: bookH + 'px' } });
+  const book = el('div.nb-book', { 'data-tx': 'bookX', 'data-ty': 'bookY', 'data-tmode': 'center', style: { left: `calc(50% + ${T.bookX}px)`, top: `calc(var(--ct) + ${T.bookY}px)`, width: T.bookW + 'px', height: bookH + 'px' } });
   const paper = el('div.nb-paper');                                        // 종이 한 장 (스티커와 함께 넘어간다)
   const hint = el('div.hint', { text: '스티커를 끌어다 붙여요' });
   paper.append(hint);
   book.append(paper);
-  const dotsNav = el('div.nb-dots', { 'data-ty': 'nbDotsY', style: { top: `calc(var(--safe-top) + ${T.nbDotsY}px)`, gap: T.nbDotGap + 'px' } });
+  const dotsNav = el('div.nb-dots', { 'data-ty': 'nbDotsY', style: { top: `calc(var(--ct) + ${T.nbDotsY}px)`, gap: T.nbDotGap + 'px' } });
   dotsNav.style.setProperty('--dot', T.nbDotSize + 'px');
   top.append(book, dotsNav);
   root.append(top);
   root.append(el('div.topbar', { style: { position: 'absolute', left: 0, right: 0, top: 0, zIndex: 6 } },
     el('div', {}, backBtn(() => go('map'), 50)), el('div'), el('div', {}, pill(icon.sticker(24), '', 'sticker'))));
   const countPill = root.querySelector('.topbar .pill .txt');
-  const panel = el('div.pink-panel', { 'data-ty': 'panelTop', 'data-tmode': 'plain', 'data-toff': Math.round(view.safeTop - 12), style: { top: `calc(var(--safe-shift, 0px) + ${T.panelTop}px)` } });   // 책이 안전영역만큼 내려가면 상자도 같이
+  const panel = el('div.pink-panel', { 'data-ty': 'panelTop', 'data-tmode': 'plain', 'data-toff': Math.round(view.contentTop - 12), style: { top: `calc(var(--safe-shift, 0px) + ${T.panelTop}px)` } });   // 책이 안전영역만큼 내려가면 상자도 같이
   const ptabs = el('div.ptabs');
   const grid = el('div.pgrid', { style: { columnGap: T.gridGapX + 'px', rowGap: T.gridGapY + 'px' } });
   grid.style.setProperty('--cell', T.cellSize + 'px');

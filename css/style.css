@@ -7,7 +7,7 @@
   --jua: 'Jua', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
   --serif: 'Noto Serif KR', 'AppleMyungjo', 'Nanum Myeongjo', 'Apple SD Gothic Neo', serif;   /* 한자: 명조 → 없으면 애플 명조 */
   --body: 'Gowun Dodum', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  --safe-top: 12px; --safe-bottom: 12px;
+  --safe-top: 12px; --safe-bottom: 12px; --ct: 12px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; background: #F3E4D4; overflow: hidden; overscroll-behavior: none; }
@@ -173,7 +173,7 @@ button { font: inherit; color: inherit; }
 
 /* ---------- 게임 ---------- */
 .game-top { position: absolute; left: 16px; top: calc(var(--safe-top) + 42px); z-index: 6; }
-.game-note { flex: none; margin: calc(var(--safe-top) + 100px) 0 0; display: flex; justify-content: center; position: relative; z-index: 4; }
+.game-note { flex: none; margin: calc(var(--ct) + 100px) 0 0; display: flex; justify-content: center; position: relative; z-index: 4; }
 .game-note .note { width: 290px; height: 140px; }
 .game-note .q-hun { font-family: var(--jua); font-size: 42px; line-height: 1.1; color: var(--ink); }
 .game-note .q-hanja { font-size: 84px; }
@@ -203,7 +203,7 @@ button { font: inherit; color: inherit; }
 /* 판매 단계 오버레이 */
 .stage-layer { position: absolute; inset: 0; z-index: 25; }
 .stage-layer .heading { position: absolute; left: 0; right: 0; top: calc(var(--safe-top) + 58px); }
-.jars { position: absolute; left: 0; right: 0; top: calc(var(--safe-top) + 106px); display: flex; justify-content: center; gap: 22px; align-items: flex-end; }
+.jars { position: absolute; left: 0; right: 0; top: calc(var(--ct) + 106px); display: flex; justify-content: center; gap: 22px; align-items: flex-end; }
 .jar { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; transition: transform 120ms; }
 .jar:active { transform: scale(0.94); }
 .jar img { width: 96px; display: block; filter: drop-shadow(0 4px 0 rgba(90,62,43,0.25)); }

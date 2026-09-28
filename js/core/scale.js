@@ -1,5 +1,5 @@
 // 뷰포트 스케일: 폭 393 논리 px 고정, 높이는 640~1000 사이에서 유동. 안전영역은 기기값을 읽어 CSS 변수로 전달.
-export const BUILD = '6ac1109d0c';          // tools/build_pwa.py 가 배포 때 버전으로 바꾼다
+export const BUILD = '0a63d457e2';          // tools/build_pwa.py 가 배포 때 버전으로 바꾼다
 export const BASE_W = 393, BASE_H = 852;   // 아이폰 15 논리 크기 = 디자인 기준
 export const MIN_H = 640;                  // (예전 값, 지금은 안 씀)
 export const MAX_H = 1000;
@@ -40,9 +40,8 @@ export function applyScale() {
   const cs = getComputedStyle(probe);
   let st = parseFloat(cs.paddingTop) || 0, sb = parseFloat(cs.paddingBottom) || 0;
   // 마우스로 보는 곳(맥 미리보기·스크린샷·조정 모드)에서는 아이폰 15 홈 화면 앱의 안전영역(위 59 · 아래 34)으로 가정한다 → 폰과 똑같이 보인다
-  const realPhone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && navigator.maxTouchPoints > 0;
-  const simulate = tuning || q.has('demo') || q.has('safe') || !realPhone;
-  if (!st && !sb && simulate && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
+  // 홈 화면 앱이 아닌 곳(맥 미리보기·크롬 기기 모드·사파리 안)에서는 기기가 안전영역을 0 으로 알려 준다 → 홈 화면 앱과 똑같이 보이게 59/34 로 가정
+  if (!st && !sb && !standalone && !q.has('nosafe')) { st = SIM_SAFE_TOP * scale; sb = SIM_SAFE_BOTTOM * scale; }
   // 안전영역은 앱이 화면 위·아래 끝까지 닿을 때만 의미가 있다
   const fills = Math.abs(h * scale - vh) < 2 || tuning;
   view.safeTop = Math.max(12, fills ? st / scale : 0);
@@ -57,8 +56,15 @@ export function applyScale() {
   view.left = r.left; view.top = r.top;
   document.documentElement.style.setProperty('--safe-top', view.safeTop.toFixed(1) + 'px');
   document.documentElement.style.setProperty('--safe-bottom', view.safeBottom.toFixed(1) + 'px');
-  // 위 안전영역이 기준(12)보다 얼마나 큰지: 위에 붙는 것들이 이만큼 내려간다
-  document.documentElement.style.setProperty('--safe-shift', (view.safeTop - 12).toFixed(1) + 'px');
+  // --safe-top: 위 막대(뒤로·젤리·프로필)는 상태 막대 바로 아래. --ct: 그 아래 본문(문제 카드·과일·꼬치·책…)의 기준선.
+  // 본문은 조정 모드에서 맞춘 자리(기준 12)에서 상태 막대가 늘어난 만큼의 40% 만 내려간다 → 위 막대와 안 겹치면서 에디터에서 본 배치에 가깝다
+  const ct = 12 + Math.max(0, view.safeTop - 12) * 0.4;
+  view.contentTop = ct;
+  document.documentElement.style.setProperty('--ct', ct.toFixed(1) + 'px');
+  document.documentElement.style.setProperty('--safe-shift', (ct - 12).toFixed(1) + 'px');
+  if (standalone && !tuning) {                                            // 홈 화면 앱: 문서 높이도 화면 전체로 (아래가 비지 않게)
+    document.documentElement.style.height = document.body.style.height = vh + 'px';
+  }
   document.documentElement.classList.toggle('standalone', standalone);
   if (q.has('debug') || debugOn) debugReadout(vw, vh, st, sb, scale, h, standalone, bleed);
   else document.getElementById('dbg-readout')?.remove();

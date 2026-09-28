@@ -58,13 +58,13 @@ export function tunedSkewer(scene, fruits, { cls = '', anim = '', coated = false
   const h = +sk.dataset.stickH;
   return el('div.tuned-skewer' + (cls ? '.' + cls : ''), {
     'data-scene': scene,
-    style: { left: `calc(50% + ${c.x}px)`, top: `calc(var(--safe-top) + ${c.y}px)`, transformOrigin: `0 ${h / 2}px`, transform: `rotate(${c.rotate || 0}deg) scale(${(c.scale || 100) / 100})` },
+    style: { left: `calc(50% + ${c.x}px)`, top: `calc(var(--ct) + ${c.y}px)`, transformOrigin: `0 ${h / 2}px`, transform: `rotate(${c.rotate || 0}deg) scale(${(c.scale || 100) / 100})` },
   }, el('div.inner' + (anim ? '.' + anim : ''), {}, sk));
 }
 /** 조리 냄비 (빈 냄비 또는 시럽이 담긴 냄비) */
 function cookPot(scene, coat) {
   const c = tune()[scene];
-  return el('div.bowl-wrap', { style: { left: c.potX + 'px', top: `calc(var(--safe-top) + ${c.potY}px)`, width: c.potWidth + 'px' } },
+  return el('div.bowl-wrap', { style: { left: c.potX + 'px', top: `calc(var(--ct) + ${c.potY}px)`, width: c.potWidth + 'px' } },
     el('div.cook-pot', {}, img('bowl'), coat ? img('syrup_' + coat, { class: 'syrup' }) : null));
 }
 
@@ -321,7 +321,7 @@ registerScreen('game', (root, params) => {
     const stirWrap = tunedSkewer('stir', S.onSkewer, { flip: true });
     const skw = stirWrap.querySelector('.inner');                      // 흔들림은 안쪽에만 (바깥은 조정 모드의 위치·크기)
     skw.style.transition = 'transform 120ms';
-    L.append(stirWrap, el('div.stir-hint', { style: { top: `calc(var(--safe-top) + ${tune().stir.hintY}px)` } }, icon.stir(150, 40)));
+    L.append(stirWrap, el('div.stir-hint', { style: { top: `calc(var(--ct) + ${tune().stir.hintY}px)` } }, icon.stir(150, 40)));
     L.append(el('div', { style: { position: 'absolute', right: '14px', bottom: 'calc(var(--safe-bottom) + 92px)' } }, img('char_' + customer, { style: { width: '92px' } })));   // 냄비 아래 오른쪽
     // 좌우로 4번 (왼쪽↔오른쪽 방향이 바뀔 때마다 1번) 저으면 코팅 완성. 손가락을 떼면(탭) 그것도 1번으로 친다
     const SWIPES = 4;
@@ -362,13 +362,13 @@ registerScreen('game', (root, params) => {
     const L = newLayer('sale');   // 손님이 먹는 장면 배경 (bg_sale.jpg) — 벽과 바닥이 이미지에 들어 있다
     L.append(placePills(el('div.pills', {}, el('div.pill.pink', {}, el('div.ico', {}, img('jelly')), el('span.txt', { text: String(progress.jelly) })), pill(icon.miniSkewer(true, 18), `${S.tanghulu + 1} / ${skewerCount}`, 'yellow'))));
     const sc = tune().sale;
-    const custEl = el('div.sale-customer.rise-in', { 'data-tx': 'custX', 'data-ty': 'custY', style: { left: sc.custX + 'px', top: `calc(var(--safe-top) + ${sc.custY}px)` } },
+    const custEl = el('div.sale-customer.rise-in', { 'data-tx': 'custX', 'data-ty': 'custY', style: { left: sc.custX + 'px', top: `calc(var(--ct) + ${sc.custY}px)` } },
       img('char_' + customer, { style: { width: sc.custSize + 'px' } }));
     L.append(custEl);
     L.append(tunedSkewer('sale', S.onSkewer, { cls: 'sale-skewer', anim: 'rise-in', coated: true, coat: S.coat }));
     await wait(450);
     custEl.querySelector('img').src = img('char_' + customer + '_happy').src;
-    L.append(el('div.sale-bubble.pop-in', { 'data-tx': 'bubbleX', 'data-ty': 'bubbleY', style: { left: sc.bubbleX + 'px', top: `calc(var(--safe-top) + ${sc.bubbleY}px)` } }, el('div.speech', {}, el('div.line', { text: isReview ? '고마워요!' : '맛있어요!' }))));
+    L.append(el('div.sale-bubble.pop-in', { 'data-tx': 'bubbleX', 'data-ty': 'bubbleY', style: { left: sc.bubbleX + 'px', top: `calc(var(--ct) + ${sc.bubbleY}px)` } }, el('div.speech', {}, el('div.line', { text: isReview ? '고마워요!' : '맛있어요!' }))));
     sfx.bell();
     await wait(500);
     let jelly = jellyFor(S.firstTry5);
@@ -377,7 +377,7 @@ registerScreen('game', (root, params) => {
     addJelly(jelly); save();
     L.querySelector('.pills .txt').textContent = String(progress.jelly);
     jellyCount.textContent = String(progress.jelly);
-    L.append(el('div.sale-jelly.pop-in', { style: { top: 'calc(var(--safe-top) + 448px)' } }, pill(img('jelly'), `+ 젤리 ${jelly}`)));
+    L.append(el('div.sale-jelly.pop-in', { style: { top: 'calc(var(--ct) + 448px)' } }, pill(img('jelly'), `+ 젤리 ${jelly}`)));
     sfx.jelly();
     // 다른 손님들의 한마디
     const others = shuffle(Object.keys(CHAT_LINES).filter(c => c !== customer && c !== 'owl')).slice(0, 3);

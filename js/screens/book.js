@@ -11,7 +11,7 @@ let tab = 1;   // 0: 8급, 1: 1장
 registerScreen('book', (root, params = {}) => {
   root.append(bgLayer('mint'));
   root.append(el('div.topbar', {}, el('div', {}, backBtn(() => go('map'), 50)), el('div'), el('div', {}, pill(img('jelly'), progress.jelly))));
-  const page = el('div.book-page', { style: { top: 'calc(var(--safe-top) + 92px)', bottom: 'calc(var(--safe-bottom) + 96px)' } });
+  const page = el('div.book-page', { style: { top: 'calc(var(--ct) + 92px)', bottom: 'calc(var(--safe-bottom) + 96px)' } });
   const rings = el('div.rings'); for (let i = 0; i < 6; i++) rings.append(el('i'));
   const tabs = el('div.tabs');
   const grid = el('div.book-grid');

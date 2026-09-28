@@ -204,11 +204,12 @@ function enableDrag() {
     e.preventDefault(); e.stopPropagation();
     const dx = (e.clientX - drag.sx) / view.scale, right = drag.mode.includes('right'), plain = drag.mode.includes('plain'), center = drag.mode.includes('center');
     const x = Math.round(right ? drag.x0 - dx : drag.x0 + dx), y = Math.round(drag.y0 + (e.clientY - drag.sy) / view.scale);
-    if (!drag.kx) { drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(--safe-top) + ${y}px)`; }
-    else if (drag.node.dataset.tx) { if (center) drag.node.style.left = `calc(50% + ${x}px)`; else drag.node.style[right ? 'right' : 'left'] = x + 'px'; drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(--safe-top) + ${y}px)`; }
-    else if (drag.kx === 'potX') { drag.node.style.left = x + 'px'; drag.node.style.top = `calc(var(--safe-top) + ${y}px)`; }
+    const base = /--ct/.test(drag.node.style.top) ? '--ct' : '--safe-top';
+    if (!drag.kx) { drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(${base}) + ${y}px)`; }
+    else if (drag.node.dataset.tx) { if (center) drag.node.style.left = `calc(50% + ${x}px)`; else drag.node.style[right ? 'right' : 'left'] = x + 'px'; drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(${base}) + ${y}px)`; }
+    else if (drag.kx === 'potX') { drag.node.style.left = x + 'px'; drag.node.style.top = `calc(var(${base}) + ${y}px)`; }
     else if (drag.node.classList.contains('skewer-wrap')) { drag.node.style.left = `calc(50% + ${x}px)`; drag.node.style.top = y + 'px'; }
-    else { drag.node.style.left = `calc(50% + ${x}px)`; drag.node.style.top = `calc(var(--safe-top) + ${y}px)`; }
+    else { drag.node.style.left = `calc(50% + ${x}px)`; drag.node.style.top = `calc(var(${base}) + ${y}px)`; }
     drag.x = x; drag.y = y;
     if (drag.kx) syncField(drag.kx, x); syncField(drag.ky, y);
   }, true);

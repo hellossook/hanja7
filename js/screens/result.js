@@ -33,7 +33,7 @@ registerScreen('result', (root, p) => {
     root.append(w);
   });
   // 탕후루 주위 반짝이 (위치·퍼짐·크기는 조정 모드 '결과'. 가운데를 끌어도 돼요)
-  const glitter = el('div.result-glitter', { 'data-tx': 'sparkX', 'data-ty': 'sparkY', 'data-tmode': 'center', style: { left: `calc(50% + ${rc.sparkX}px)`, top: `calc(var(--safe-top) + ${rc.sparkY}px)` } });
+  const glitter = el('div.result-glitter', { 'data-tx': 'sparkX', 'data-ty': 'sparkY', 'data-tmode': 'center', style: { left: `calc(50% + ${rc.sparkX}px)`, top: `calc(var(--ct) + ${rc.sparkY}px)` } });
   const SPARK = [[-1, -0.9, '#fff', 1], [0.15, -1, '#FFD84F', 0.8], [1, -0.7, '#fff', 0.9], [-1.05, 0.05, '#FFD84F', 0.7], [1.05, 0.15, '#FFE9A8', 1], [-0.85, 0.85, '#fff', 0.8], [0.1, 1, '#FFD84F', 1], [0.95, 0.9, '#fff', 0.7], [-0.4, -0.5, '#FFE9A8', 0.5], [0.5, 0.45, '#fff', 0.55]];
   SPARK.forEach(([ux, uy, c, k], i) => glitter.append(el('div.sparkle', { style: { left: Math.round(ux * rc.sparkSpread) + 'px', top: Math.round(uy * rc.sparkSpread * 1.25) + 'px', animationDelay: (i * 170) % 900 + 'ms' } }, icon.sparkle(Math.round(rc.sparkSize * k), c))));
   root.append(glitter);

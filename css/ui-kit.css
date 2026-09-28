@@ -208,7 +208,7 @@
 .done-bubble.result { bottom: calc(var(--safe-bottom) + 136px); }
 .done-bubble.result .note { padding: 14px 22px 16px; }
 .sale-note { margin-top: 36px; }
-.jars { top: calc(var(--safe-top) + 98px); }
+.jars { top: calc(var(--ct) + 98px); }
 
 /* ---------- 14. 작은 부품 ---------- */
 .learn-card .words, .detail .words {
