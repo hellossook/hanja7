@@ -103,5 +103,5 @@ export function starsFor(firstTryCorrect) {
 /** 탕후루 1개 젤리: 기본 10 + 첫 시도 정답 1개당 2 (최대 20) */
 export function jellyFor(firstTryCorrect5) { return 10 + 2 * Math.min(5, firstTryCorrect5); }
 export const REVIEW_BONUS = 15;
-export const REVIEW_THRESHOLD = 5;   // box 0 글자가 이 수 이상이면 복습 손님 등장
+export const REVIEW_THRESHOLD = 3;   // box 0 글자가 이 수 이상이면 복습 손님 등장 (2026-09-29: 5 → 3)
 export const WALL_MAX = 400;  // 스티커북에 붙일 수 있는 최대 (넘치면 가장 오래된 것부터 정리)
