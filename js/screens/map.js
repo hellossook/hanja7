@@ -7,7 +7,7 @@ import { box0Ids, reviewSet } from '../quiz.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { sfx, setSound, buzz } from '../core/audio.js';
 import { profileCard } from './title.js';
-import { save } from '../core/store.js';
+import { save, resetProgress } from '../core/store.js';
 
 // 캔디맵 노드 좌표 (393x1180 맵 기준, bg_map_candy 길 위) + 과일 알
 // 노드 위치는 js/data/tuning.json 의 map.n1X~n6Y · gateX/Y (조정 모드 '맵'에서 끌어 옮긴다)
@@ -67,10 +67,23 @@ export function renameDialog(root, onDone) {
   const dlg = el('div.dialog.rename.pop-in', { style: { top: 'calc(var(--safe-top) + 120px)' } },
     el('div.dtitle', { text: '가게 이름 바꾸기' }),
     input,
-    el('div.dbtn.two', {}, button('취소', 'small', () => { sfx.tap(); ov.remove(); }), button('확인', 'yellow small', ok)));
+    el('div.dbtn.two', {}, button('취소', 'small', () => { sfx.tap(); ov.remove(); }), button('확인', 'yellow small', ok)),
+    el('button.text-btn.reset-link', { text: '처음부터 다시 시작', onClick: () => { sfx.tap(); ov.remove(); resetDialog(root); } }));
   ov.append(dlg); root.append(ov);
   setTimeout(() => { input.focus(); input.select(); }, 60);
   return ov;
+}
+
+/** 처음부터 다시: 진행(스테이지·젤리·스티커·한자 기록)을 모두 지운다. 두 번 확인 */
+function resetDialog(root) {
+  const ov = el('div.overlay');
+  ov.append(el('div.scrim', { onClick: () => ov.remove() }));
+  const dlg = el('div.dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 140px)' } },
+    el('div.dtitle', { text: '처음부터 다시 시작할까요?' }),
+    el('div.dbody', { html: '지금까지의 가게, 젤리, 스티커,<br>한자 기록이 모두 지워져요.' }),
+    el('div.dbtn.two', {}, button('취소', 'small', () => { sfx.tap(); ov.remove(); }),
+      button('모두 지우기', 'yellow small', () => { resetProgress(); sfx.pop(); location.reload(); })));
+  ov.append(dlg); root.append(ov);
 }
 
 registerScreen('map', (root, params = {}) => {

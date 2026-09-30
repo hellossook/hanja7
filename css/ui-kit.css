@@ -769,3 +769,5 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 /* 복습 손님 말풍선: 글씨는 몸통(꼬리 뺀 부분, 위 2px~아래 13px 은 그림의 빈 여백)의 세로 가운데. 꼬리 그림은 글씨 뒤로 */
 .owl-node .speech.owl-bub { padding-top: 15px; padding-bottom: 27px; }
 .owl-node .speech.owl-bub .line { position: relative; z-index: 1; }
+.dialog .reset-link { font-size: 14px; color: #B39C90; padding: 4px 8px 0; }
+.dialog .dbtn.two .btn { white-space: nowrap; }

@@ -5,6 +5,7 @@ import { unlockAudio, bgm } from './core/audio.js';
 import { loadSkins, startSkins } from './core/skin.js';
 import { loadTuning, tuneMode } from './core/tune.js';
 import { HANJA } from './data/hanja.js';
+import { resetProgress } from './core/store.js';
 import './screens/title.js';
 import './screens/map.js';
 import './screens/learn.js';
@@ -24,6 +25,7 @@ const query = new URLSearchParams(location.search);
 // 한자 글꼴(Noto Serif KR)은 글자별 조각으로 나뉘어 있어, 처음 보는 글자는 잠깐 다른 글꼴로 보일 수 있다 → 미리 전부 불러 둔다
 const hanjaText = [...new Set(HANJA.map(c => c.hanja + c.words.map(w => w.word).join('')).join(''))].join('');
 const fontsReady = document.fonts ? Promise.race([document.fonts.load(`700 40px "Noto Serif KR"`, hanjaText), new Promise(r => setTimeout(r, 2500))]).catch(() => {}) : Promise.resolve();
+if (new URLSearchParams(location.search).has('reset')) { resetProgress(); history.replaceState(null, '', location.pathname); }   // 주소에 ?reset=1 → 처음부터
 Promise.all([loadSkins(), loadTuning(), fontsReady]).then(() => {
   startSkins();
   if (tuneMode) import('./core/tunePanel.js').then(m => m.startTunePanel());   // 조정 모드: index.html?tune=1
