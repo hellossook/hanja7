@@ -1,6 +1,6 @@
 // S4 게임 화면 (탕후루 만들기) + S5 판매 흐름 (코팅 고르기 → 저어주기 → 완성 → 판매) — v2 스티커 스타일
 import { el, img, icon, go, button, registerScreen, wait, sparkles, bgLayer, tile, pill, noteCard, ribbon, roundBtn, chatBubble, faceBadge, frameBadge, shuffle, pick, backBtn, toast, fitText } from '../core/ui.js';
-import { STAGE_BY_ID, jellyFor, starsFor, REVIEW_BONUS, COATINGS, ORDER_LINES, CHAT_LINES, UNLOCKS, CUSTOMERS } from '../data/stages.js';
+import { STAGE_BY_ID, jellyFor, starsFor, REVIEW_BONUS, COATINGS, ORDER_LINES, CHAT_LINES, UNLOCKS, CUSTOMERS, chapterCustomers } from '../data/stages.js';
 import { buildStage, buildReview } from '../quiz.js';
 import { progress, recordAnswer, recordStage, addJelly, grantSticker, grantUnlock, unlockedCoats, addWallSticker, save } from '../core/store.js';
 import { stickerEl, randomWallSpot, VARIANT_COUNT } from '../wall.js';
@@ -148,7 +148,7 @@ registerScreen('game', (root, params) => {
 
   // ---------- 손님 주문 토스트 ----------
   function showOrder(index, hold = false) {
-    const lines = ORDER_LINES[customer] || ORDER_LINES.boss;
+    const lines = ORDER_LINES[customer] || ORDER_LINES.generic;
     S.locked = true;
     opts.innerHTML = ''; opts.style.visibility = 'hidden';
     return new Promise(resolve => {
@@ -387,14 +387,14 @@ registerScreen('game', (root, params) => {
     L.append(el('div.sale-jelly.pop-in', { style: { top: 'auto', bottom: 'calc(var(--safe-bottom) + 326px)' } }, pill(img('jelly'), `+ 젤리 ${jelly}`)));   // 손님 채팅(최대 3줄) 바로 위 — 채팅과 안 겹친다
     sfx.jelly();
     // 다른 손님들의 한마디
-    const others = shuffle(Object.keys(CHAT_LINES).filter(c => c !== customer && c !== 'owl')).slice(0, 3);
+    const others = shuffle(chapterCustomers(stage.chapter).filter(c => c !== customer)).slice(0, 3);   // 같은 챕터의 다른 손님들이 구경
     // 아래 버튼 위에 붙인다 (안전영역이 커도 안 겹친다). 마지막 탕후루면 '모두 판매했어요' 문구 자리만큼 올리고 채팅을 조금 촘촘하게
     const lastSale = S.qi >= questions.length;
     const list = el('div.chat-list' + (lastSale ? '.tight' : ''), { style: { bottom: `calc(var(--safe-bottom) + ${lastSale ? 138 : 104}px)` } });
     L.append(list);
     for (let i = 0; i < others.length; i++) {
       await wait(260);
-      list.append(el('div.chat-item', {}, faceBadge(others[i], lastSale ? 52 : 58), el('div.msg', { text: pick(CHAT_LINES[others[i]]) })));
+      list.append(el('div.chat-item', {}, faceBadge(others[i], lastSale ? 52 : 58), el('div.msg', { text: pick(CHAT_LINES[others[i]] || CHAT_LINES.generic) })));
     }
     await stickCustomerSticker(L, custEl);
     S.last = { fruits: S.onSkewer.slice(), coat: S.coat };

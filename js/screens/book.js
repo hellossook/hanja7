@@ -1,7 +1,9 @@
 // S7 한자도감 — 스프링 노트 (v2)
 import { el, icon, go, button, registerScreen, stars, toast, bgLayer, tile, pill, img, roundBtn, closeBtn , backBtn, scrollBar } from '../core/ui.js';
 import { tune } from '../core/tune.js';
-import { GRADE8, CHAPTER1, displayHunEum } from '../data/hanja.js';
+import { GRADE8, CHAPTER1, chapterChars, displayHunEum } from '../data/hanja.js';
+import { CHAPTERS, STAGES } from '../data/stages.js';
+import { stageState } from '../core/store.js';
 import { progress } from '../core/store.js';
 import { reviewPriority, seenIds } from '../quiz.js';
 import { sfx } from '../core/audio.js';
@@ -23,15 +25,21 @@ registerScreen('book', (root, params = {}) => {
   Object.assign(sbar.dataset, { ty: 'sbTop', tmode: 'plain' });
   page.append(rings, el('div.head', { text: '한자 도감' }), tabs, scroll, count, sbar);
   root.append(page);
-  root.append(el('div.book-nav.l', { style: { left: '40px' } }, roundBtn(tab === 1, () => { tab = 0; renderTabs(); renderGrid(); }, 64)),
-    el('div.book-nav', { style: { right: '40px' } }, roundBtn(tab === 0, () => { tab = 1; renderTabs(); renderGrid(); }, 64)));
+  const openTabs = () => [0, ...CHAPTERS.filter(ch => ch.id === 1 || stageState(STAGES[STAGES.indexOf(STAGES.find(s => s.chapter === ch.id && s.id !== '8')) - 1].id).cleared).map(ch => ch.id)];
+  const step = d => { const t = openTabs(); const i = t.indexOf(tab); const n = t[i + d]; if (n == null) return; tab = n; sfx.tap(); renderTabs(); renderGrid(); };
+  root.append(el('div.book-nav.l', { style: { left: '40px' } }, roundBtn(tab > 0, () => step(-1), 64)),
+    el('div.book-nav', { style: { right: '40px' } }, roundBtn(true, () => step(1), 64)));
 
   function renderTabs() {
     tabs.innerHTML = '';
-    tabs.append(el('button.tab' + (tab === 0 ? '.on' : ''), { text: '8급', onClick: () => { tab = 0; sfx.tap(); renderTabs(); renderGrid(); } }),
-      el('button.tab' + (tab === 1 ? '.on' : ''), { text: '1장 하늘과 땅', onClick: () => { tab = 1; sfx.tap(); renderTabs(); renderGrid(); } }),
-      el('button.tab.lock', { onClick: () => toast('챕터 2는 준비 중이에요') }, icon.lock(14, '#8E827A'), '2장'));
-    root.querySelectorAll('.book-nav .round-btn').forEach((b, i) => b.classList.toggle('active', i === 0 ? tab === 1 : tab === 0));
+    tabs.append(el('button.tab' + (tab === 0 ? '.on' : ''), { text: '8급', onClick: () => { tab = 0; sfx.tap(); renderTabs(); renderGrid(); } }));
+    for (const ch of CHAPTERS) {                                  // 챕터 첫 스테이지가 열려야 그 장을 볼 수 있다
+      const first = STAGES.find(s => s.chapter === ch.id && s.id !== '8');
+      const open = ch.id === 1 || stageState(STAGES[STAGES.indexOf(first) - 1].id).cleared;
+      if (open) tabs.append(el('button.tab' + (tab === ch.id ? '.on' : ''), { text: `${ch.id}장`, onClick: () => { tab = ch.id; sfx.tap(); renderTabs(); renderGrid(); } }));
+      else tabs.append(el('button.tab.lock', { onClick: () => toast(`${ch.id - 1}장을 다 깨면 열려요`) }, icon.lock(14, '#8E827A'), `${ch.id}장`));
+    }
+    root.querySelectorAll('.book-nav .round-btn').forEach((b, i) => b.classList.toggle('active', i === 0 ? tab > 0 : tab < 5));
   }
   function cellState(c) {
     const s = progress.chars[c.id];
@@ -41,7 +49,7 @@ registerScreen('book', (root, params = {}) => {
   }
   function renderGrid() {
     grid.innerHTML = '';
-    const list = tab === 0 ? GRADE8 : CHAPTER1;
+    const list = tab === 0 ? GRADE8 : chapterChars(tab);
     let learned = 0;
     for (const c of list) {
       const st = cellState(c);

@@ -18,4 +18,13 @@ export const CHAR_STICKERS = [
   { id: '20', name: '보라 토끼' },
   { id: '23', name: '갈색 고양이' },
   { id: '24', name: '흰 고양이' },
+  { id: 'n01', name: '여학생' },
+  { id: 'n02', name: '경찰관' },
+  { id: 'n03', name: '소방관' },
+  { id: 'n04', name: '카피바라' },
+  { id: 'n05', name: '우주비행사' },
+  { id: 'n06', name: '호박 아이' },
+  { id: 'n07', name: '쿼카' },
+  { id: 'n08', name: '다람쥐' },
+  { id: 'n09', name: '분홍 원피스 아주머니' },
 ];

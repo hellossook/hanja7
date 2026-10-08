@@ -1,7 +1,7 @@
 // S6 결과 — 리본 + 체크무늬 카드 + 젤리 받기 (v2)
 import { el, img, icon, go, button, registerScreen, stars, ribbon, bgLayer, pill, noteCard } from '../core/ui.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
-import { STAGE_BY_ID, STAGE_ORDER, STICKER_BY_ID, unlockName, COATINGS } from '../data/stages.js';
+import { STAGE_BY_ID, STAGE_ORDER, STICKER_BY_ID, unlockName, COATINGS, stageLabel } from '../data/stages.js';
 import { sfx } from '../core/audio.js';
 import { tunedSkewer } from './game.js';
 import { tune } from '../core/tune.js';
@@ -14,7 +14,7 @@ registerScreen('result', (root, p) => {
   const rc = tune().result;
   /** 글자 묶음을 가운데 기준으로 놓는다 (x = 가운데에서 옮긴 만큼, y = 화면 위에서). 조정 모드 '결과'에서 끌어 옮길 수 있다 */
   const place = (node, kx, ky, x, y, safe = false) => el('div.r-place', { 'data-tx': kx || null, 'data-ty': ky, 'data-tmode': (kx ? 'center' : '') + (safe ? '' : ' plain'), style: { left: `calc(50% + ${x}px)`, top: safe ? `calc(var(--safe-top) + ${y}px)` : y + 'px' } }, node);
-  const title = p.review ? '복습 완료!' : `${STAGE_ORDER.indexOf(p.stageId) + 1}. ${STAGE_BY_ID[p.stageId].name} 클리어!`;
+  const title = p.review ? '복습 완료!' : `${stageLabel(p.stageId)} 클리어!`;
   const rib = ribbon(title, 'pink');
   if (rc.titleSize) rib.querySelector('span').style.fontSize = rc.titleSize + 'px';
   rib.querySelector('span').style.top = rc.titleTextY + 'px';   // 리본 안 글씨 높이

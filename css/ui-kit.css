@@ -707,7 +707,7 @@ body.bleed #app { overflow: visible; }
 body.bleed .screen::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: inherit; z-index: -2; pointer-events: none; }
 body.bleed .map-scroll { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 body.bleed .map-world { margin-left: var(--bleed); }
-body.bleed .map-world::before { content: ''; position: absolute; top: 200px; height: 1180px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: url('../assets/ui/map/bg_map_candy.jpg') center top / 100% 100%; filter: blur(6px) saturate(1.05); opacity: 0.9; }
+body.bleed .map-world::before { content: ''; position: absolute; top: 200px; height: 1180px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: var(--map-bg, url('../assets/ui/map/bg_map_candy.jpg')) center top / 100% 100%; filter: blur(6px) saturate(1.05); opacity: 0.9; }
 body.bleed .bg-layer { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 
@@ -771,3 +771,15 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .owl-node .speech.owl-bub .line { position: relative; z-index: 1; }
 .dialog .reset-link { font-size: 14px; color: #B39C90; padding: 4px 8px 0; }
 .dialog .dbtn.two .btn { white-space: nowrap; }
+
+/* ---------- 51. 챕터 2~5 맵: 열린 문 · 앞 장 문 · 완주 트로피 ---------- */
+.cnode.gate.gate-open { cursor: pointer; }
+.cnode.gate .gate-glow { position: absolute; left: 50%; top: 50%; width: 70px; height: 70px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,150,0.85) 0%, rgba(255,220,100,0.35) 45%, rgba(255,220,100,0) 70%); animation: gate-pulse 1400ms ease-in-out infinite; pointer-events: none; }
+@keyframes gate-pulse { 0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; } 50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } }
+.cnode.gate.gate-open .clabel { color: #D6457A; animation: boing 1300ms ease-in-out infinite; }
+.cnode.gate .gate-lock.gate-unlock { animation: lock-pop 700ms cubic-bezier(.3, 0, .6, 1) forwards !important; }
+.cnode.prev { width: 0; height: 0; margin: 0; }
+.cnode.prev .clabel { top: 0; transform: translate(-50%, -50%); color: #8E6B5A; }
+.cnode.gate.trophy .clabel { top: 70px; color: #D6457A; }
+.cnode.gate.trophy .cclear.done-all { top: 30px; left: 50%; width: 120px; height: 40px; transform: translate(-50%, -50%) rotate(-6deg); }

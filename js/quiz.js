@@ -8,8 +8,7 @@ import { shuffle, pick } from './core/ui.js';
 export function learnedIds(stageId) {
   const ids = new Set(GRADE8.map(c => c.id));
   const idx = STAGE_ORDER.indexOf(stageId);
-  for (let i = 1; i <= idx; i++) STAGE_BY_ID[STAGE_ORDER[i]].chars.forEach(id => ids.add(id));
-  if (stageId === '1-5') STAGE_BY_ID['1-5'].chars.forEach(id => ids.add(id));
+  for (let i = 1; i <= idx; i++) STAGE_BY_ID[STAGE_ORDER[i]].chars.forEach(id => ids.add(id));   // 그 스테이지까지 (종합은 챕터 20자 전부)
   return ids;
 }
 
@@ -125,7 +124,7 @@ export function buildStage(stageId) {
   let targets;
   if (stageId === '8') {
     targets = shuffle(stage.chars).slice(0, 15);
-  } else if (stageId === '1-5') {
+  } else if (stage.boss) {                                    // 종합: 챕터 20자 중 복습 우선순위가 높은 것 위주
     targets = reviewPriority(stage.chars).slice(0, 12).concat(shuffle(stage.chars).slice(0, 3));
     targets = shuffle(targets).slice(0, 15);
   } else {
@@ -164,7 +163,7 @@ function assignModes(targetIds, modes, learned) {
 
 /** 복습 5문제 (복습 손님 / 도감 복습하기). ids: 출제할 글자들 */
 export function buildReview(ids) {
-  const learned = learnedIds('1-5');
+  const learned = learnedIds(STAGE_ORDER[STAGE_ORDER.length - 1]);   // 복습: 배운 글자 전부 기준
   let pool = [...new Set(ids)];
   if (pool.length < 5 || pool.length % 5) pool = pool.concat(reviewFill(pool, Math.max(5, Math.ceil(pool.length / 5) * 5) - pool.length));
   const modes = [];

@@ -17,8 +17,9 @@ const ASSET_MAP = {
 };
 export function asset(name) {
   if (ICON_OVERRIDE[name]) return UI_ICON_DIR + ICON_OVERRIDE[name] + '.png';
-  if (name.startsWith('char_')) return CHAR_DIR + name.slice(5).replace(/_happy$/, '') + '.png';
-  if (name.startsWith('face_')) return CHAR_DIR + name + '.png';
+  // 손님: 역할 이름(rabbit…)은 assets/chars/<역할>.png, 수채화 번호('01', 'n03'…)는 assets/chars/w/<번호>.png
+  if (name.startsWith('char_')) { const c = name.slice(5).replace(/_happy$/, ''); return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '.png' : CHAR_DIR + c + '.png'; }
+  if (name.startsWith('face_')) { const c = name.slice(5); return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '_face.png' : CHAR_DIR + name + '.png'; }
   // 과일 (tools/build_fruits.py): fruit_<id> 진열용 통과일 · piece_<id>[_<코팅>] 꼬치 조각
   if (name.startsWith('fruit_')) return FRUIT_DIR + name.slice(6) + '.png';
   if (name.startsWith('piece_')) { const [id, coat] = name.slice(6).split('_'); return FRUIT_DIR + id + '_piece' + (coat ? '_' + coat : '') + '.png'; }
