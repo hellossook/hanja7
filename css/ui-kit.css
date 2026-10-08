@@ -780,6 +780,6 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .cnode.gate.gate-open .clabel { color: #D6457A; animation: boing 1300ms ease-in-out infinite; }
 .cnode.gate .gate-lock.gate-unlock { animation: lock-pop 700ms cubic-bezier(.3, 0, .6, 1) forwards !important; }
 .cnode.prev { width: 0; height: 0; margin: 0; }
-.cnode.prev .clabel { top: 0; transform: translate(-50%, -50%); color: #8E6B5A; }
+.cnode.prev .clabel { top: 0; transform: translate(-50%, -50%); color: #D6457A; }
 .cnode.gate.trophy .clabel { top: 70px; color: #D6457A; }
 .cnode.gate.trophy .cclear.done-all { top: 30px; left: 50%; width: 120px; height: 40px; transform: translate(-50%, -50%) rotate(-6deg); }

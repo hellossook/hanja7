@@ -70,7 +70,7 @@ const RULES = [
   { sel: '.profile .bar i',   skin: 'xpfill',  tints: [] },
   { sel: '.profile .bar',     skin: 'xptrack', tints: [] },
   { sel: '.profile',          skin: 'profile', tints: [] },
-  { sel: '.cnode.gate.gate-open .clabel', skin: 'xptrack', tints: [['*', 'labelPink']] },   // 열린 문: 분홍 테두리
+  { sel: '.cnode.gate.gate-open .clabel, .cnode.prev .clabel', skin: 'xptrack', tints: [['*', 'labelPink']] },   // 열린 문("2장으로 ▶")·앞 장 문("◀ 1장"): 분홍 테두리
   { sel: '.cnode.lock .clabel', skin: 'label',   tints: [['*', 'labelLock']] },   // 잠긴 노드 이름표: 회색 라벨
   { sel: '.cnode .clabel',     skin: 'xptrack', tints: [] },                     // 클리어·진행 중 노드 이름표: panel_xpbar_track
   { sel: '.book-page .head',  skin: 'header',  tints: [['*', 'headPink']] },   // 도감 제목: 헤더 알약을 분홍으로
