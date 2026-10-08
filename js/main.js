@@ -5,7 +5,8 @@ import { unlockAudio, bgm } from './core/audio.js';
 import { loadSkins, startSkins } from './core/skin.js';
 import { loadTuning, tuneMode } from './core/tune.js';
 import { HANJA } from './data/hanja.js';
-import { resetProgress } from './core/store.js';
+import { resetProgress, progress, save } from './core/store.js';
+import { STAGE_ORDER, UNLOCKS } from './data/stages.js';
 import './screens/title.js';
 import './screens/map.js';
 import './screens/learn.js';
@@ -26,6 +27,13 @@ const query = new URLSearchParams(location.search);
 const hanjaText = [...new Set(HANJA.map(c => c.hanja + c.words.map(w => w.word).join('')).join(''))].join('');
 const fontsReady = document.fonts ? Promise.race([document.fonts.load(`700 40px "Noto Serif KR"`, hanjaText), new Promise(r => setTimeout(r, 2500))]).catch(() => {}) : Promise.resolve();
 if (new URLSearchParams(location.search).has('reset')) { resetProgress(); history.replaceState(null, '', location.pathname); }   // 주소에 ?reset=1 → 처음부터
+// 테스트용: ?open=1-5 → 그 스테이지 앞까지 모두 깬 것으로 (별 3개), 그 스테이지가 열린다
+const openTo = new URLSearchParams(location.search).get('open');
+if (openTo && STAGE_ORDER.includes(openTo)) {
+  for (const id of STAGE_ORDER.slice(0, STAGE_ORDER.indexOf(openTo))) progress.stages[id] = { cleared: true, bestStars: 3, plays: 1 };
+  for (const id of STAGE_ORDER.slice(0, STAGE_ORDER.indexOf(openTo))) for (const u of [UNLOCKS[id]]) if (u && !progress.unlocks.includes(u.id)) progress.unlocks.push(u.id);
+  progress.tutorialDone = true; save(); history.replaceState(null, '', location.pathname);
+}
 Promise.all([loadSkins(), loadTuning(), fontsReady]).then(() => {
   startSkins();
   if (tuneMode) import('./core/tunePanel.js').then(m => m.startTunePanel());   // 조정 모드: index.html?tune=1
