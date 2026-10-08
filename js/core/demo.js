@@ -40,6 +40,7 @@ export function runDemo(q) {
     result: () => go('result', { stageId: '1-2', stars: 2, jelly: 52, firstTry: 12, wrongIds: ['川', '地'], unlock: { type: 'coat', id: 'choco' }, last, demoReward: state === 'reward',
       made: [{ fruits: ['kiwi', 'apple', 'strawberry', 'grape', 'tangerine'], coat: 'sugar' }, { fruits: ['tangerine', 'strawberry', 'kiwi', 'apple', 'grape'], coat: 'sugar' }, last] }),
     book: () => go('book', { demoDetail: state === 'detail' ? '天' : null }),
+    shop: () => go('shop', { demoConfirm: state === 'confirm' }),
     stickers: () => go('stickers', { demoTurn: state.startsWith('turn') ? (Number(state.slice(4)) || 42) / 100 : 0 }),   // state=turn55 → 55% 넘긴 모습
   };
   (routes[screen] || routes.splash)();

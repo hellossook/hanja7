@@ -1,5 +1,6 @@
 // 공통 UI 조각: 라우터, 요소 생성, 아이콘, v2 스티커 스타일 부품, 에셋 경로
 import { sfx, buzz, bgm } from './audio.js';
+import { progress } from './store.js';
 
 // 에셋 매니페스트 — PNG(@3x)로 교체할 때 여기 확장자만 바꾸면 된다.
 const ASSET_DIR = 'assets/img/';
@@ -18,8 +19,19 @@ const ASSET_MAP = {
 export function asset(name) {
   if (ICON_OVERRIDE[name]) return UI_ICON_DIR + ICON_OVERRIDE[name] + '.png';
   // 손님: 역할 이름(rabbit…)은 assets/chars/<역할>.png, 수채화 번호('01', 'n03'…)는 assets/chars/w/<번호>.png
-  if (name.startsWith('char_')) { const c = name.slice(5).replace(/_happy$/, ''); return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '.png' : CHAR_DIR + c + '.png'; }
-  if (name.startsWith('face_')) { const c = name.slice(5); return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '_face.png' : CHAR_DIR + name + '.png'; }
+  if (name.startsWith('char_')) {
+    const c = name.slice(5).replace(/_happy$/, '');
+    if (c === 'boss' && progress.costume && progress.costume !== 'default') return CHAR_DIR + 'costume/' + progress.costume + '.png';   // 사장님: 입고 있는 코스튬 (상점)
+    if (c === 'costume:default') return CHAR_DIR + 'boss.png';
+    if (c.startsWith('costume:')) return CHAR_DIR + 'costume/' + c.slice(8) + '.png';
+    return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '.png' : CHAR_DIR + c + '.png';
+  }
+  if (name.startsWith('face_')) {
+    const c = name.slice(5);
+    if (c === 'boss' && progress.costume && progress.costume !== 'default') return CHAR_DIR + 'costume/' + progress.costume + '_face.png';
+    if (c.startsWith('costume:')) return CHAR_DIR + 'costume/' + c.slice(8) + '_face.png';
+    return /^n?\d+$/.test(c) ? CHAR_DIR + 'w/' + c + '_face.png' : CHAR_DIR + name + '.png';
+  }
   // 과일 (tools/build_fruits.py): fruit_<id> 진열용 통과일 · piece_<id>[_<코팅>] 꼬치 조각
   if (name.startsWith('fruit_')) return FRUIT_DIR + name.slice(6) + '.png';
   if (name.startsWith('piece_')) { const [id, coat] = name.slice(6).split('_'); return FRUIT_DIR + id + '_piece' + (coat ? '_' + coat : '') + '.png'; }

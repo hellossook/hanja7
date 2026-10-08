@@ -14,6 +14,7 @@ import './screens/game.js';
 import './screens/result.js';
 import './screens/book.js';
 import './screens/stickers.js';
+import './screens/shop.js';
 
 initScale();
 window.addEventListener('pointerdown', () => { unlockAudio(); document.body.dataset.bgm = '1'; bgm.start(); }, { once: true });   // 첫 터치에서 오디오를 깨우고 배경 음악 시작

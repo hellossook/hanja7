@@ -195,6 +195,7 @@ registerScreen('map', (root, params = {}) => {
       el('div.map-side', {},
         pill(img('jelly'), progress.jelly),
         el('div.map-tiles', {},
+          menuBtn(el('div.shop-ico', {}, faceBadge('boss', 40, false, 'profile')), '상점', () => { sfx.tap(); go('shop'); }),   // 젤리로 코스튬 사기
           menuBtn(icon.book(44), '도감', () => { sfx.tap(); go('book'); }),
           menuBtn(icon.sticker(44), '스티커', () => { sfx.tap(); go('stickers'); }),
           snd))));

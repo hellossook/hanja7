@@ -16,6 +16,8 @@ function fresh() {
     settings: { sound: true },
     tutorialDone: false,
     shopName: '사장님네 탕후루',   // 맵 프로필의 연필로 바꾼다
+    costumes: ['default'],         // 상점에서 산 사장님 코스튬 (js/data/costumes.js)
+    costume: 'default',            // 입고 있는 코스튬
     pendingClear: null,            // 방금 처음 깬 스테이지 (맵에서 도장 연출 한 번)
   };
 }
@@ -29,6 +31,8 @@ function load() {
     const p = Object.assign(fresh(), JSON.parse(raw));
     p.settings = Object.assign({ sound: true }, p.settings || {});
     if (!p.shopName || !String(p.shopName).trim()) p.shopName = '사장님네 탕후루';
+    if (!Array.isArray(p.costumes) || !p.costumes.includes('default')) p.costumes = ['default', ...(p.costumes || [])];
+    if (!p.costume || !p.costumes.includes(p.costume)) p.costume = 'default';
     delete p.diary; delete p.gallery;
     p.unlocks = p.unlocks.map(id => id === 'goldberry' ? 'rainbowjelly' : id);   // 황금 딸기 → 무지개 젤리 (그림 교체)
     for (const id of p.stickers) {
@@ -83,6 +87,14 @@ export function recordStage(id, stars) {
 }
 
 export function addJelly(n) { progress.jelly += n; }
+/** 젤리로 코스튬 사기. 모자라면 false */
+export function buyCostume(id, price) {
+  if (progress.costumes.includes(id)) return true;
+  if (progress.jelly < price) return false;
+  progress.jelly -= price; progress.costumes.push(id); progress.costume = id; save();
+  return true;
+}
+export function wearCostume(id) { if (progress.costumes.includes(id)) { progress.costume = id; save(); } }
 
 export function grantSticker(id) {
   if (progress.stickers.includes(id)) return false;
