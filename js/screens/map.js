@@ -149,9 +149,13 @@ registerScreen('map', (root, params = {}) => {
     const gate = el('div.cnode.gate' + (open ? '.gate-open' : '.lock'), { 'data-tx': 'gateX', 'data-ty': 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } },
       open ? el('div.gate-glow') : gateLock(), el('div.clabel', { text: open ? `${chapter + 1}장으로 ▶` : `${chapter + 1}장` }));
     if (!open && pending === lastId) fx.gateNode = gate;                 // 방금 챕터를 끝냈다 → 자물쇠가 열리는 연출
+    if (open) [[-44, -30, '#FFE27A', 0], [50, -36, '#fff', 300], [-52, 30, '#fff', 600], [58, 24, '#FFE27A', 900], [8, -58, '#FFF3B0', 450]].forEach(([x, y, c, d]) =>
+      gate.append(el('div.sparkle.gate-twinkle', { style: { left: (33 + x) + 'px', top: (33 + y) + 'px', animationDelay: d + 'ms' } }, icon.sparkle(16, c))));   // 열린 문 주위 반짝임
+    let going = false;
     gate.addEventListener('click', () => {
       if (!stageState(lastId).cleared) { sfx.wrong(); toast(`${stageLabel(lastId)}을 먼저 깨요!`); return; }
-      sfx.unlock(); go('map', { chapter: chapter + 1 });
+      if (going) return; going = true;
+      gateTransition(gate, chapter + 1);
     });
     world.append(gate);
   } else if (stageState(lastId).cleared) {                                 // 마지막 챕터 정상: 완주
@@ -195,6 +199,24 @@ registerScreen('map', (root, params = {}) => {
           menuBtn(icon.sticker(44), '스티커', () => { sfx.tap(); go('stickers'); }),
           snd))));
   root.append(top);
+
+  /** 다음 장으로: 문에서 빛이 퍼지고 반짝이가 튀며 화면이 하얗게 차오른 뒤, 새 장 이름이 떴다가 새 맵이 나타난다 */
+  function gateTransition(gate, nextChapter) {
+    sfx.unlock(); buzz(20);
+    const burst = el('div.gate-burst'); gate.append(burst);                 // 문에서 퍼지는 빛
+    for (let i = 0; i < 14; i++) {                                           // 사방으로 튀는 반짝이
+      const a = (i / 14) * Math.PI * 2, r = 70 + (i % 3) * 30;
+      gate.append(el('div.sparkle.gate-shoot', { style: { left: '33px', top: '33px', '--dx': Math.cos(a) * r + 'px', '--dy': Math.sin(a) * r + 'px', animationDelay: (i % 4) * 60 + 'ms' } }, icon.sparkle(14 + (i % 3) * 5, i % 2 ? '#fff' : '#FFE27A')));
+    }
+    setTimeout(() => sfx.coat(), 250);
+    const flash = el('div.chapter-flash', {}, el('div.chapter-title.pop-in', {}, el('div.ch-no', { text: `${nextChapter}장` }), el('div.ch-name', { text: CHAPTER_BY_ID[nextChapter].name })));
+    document.getElementById('stage').append(flash);
+    setTimeout(() => flash.classList.add('on'), 320);                       // 빛이 먼저 퍼지고, 그다음 하얗게 차오름 (700ms)
+    setTimeout(() => {
+      go('map', { chapter: nextChapter });                                   // 새 맵은 흰 화면 뒤에서 준비
+      setTimeout(() => { flash.classList.add('off'); setTimeout(() => flash.remove(), 900); }, 900);   // 장 이름을 잠깐 보여 준 뒤 걷힌다
+    }, 1100);
+  }
 
   /** 처음 깬 스테이지: 클리어 리본이 도장처럼 쿵 찍히고, 다음 가게의 자물쇠가 터지며 열린다 (한 번만). 챕터 마지막이면 위 커튼 문이 열린다 */
   function playClearFx() {

@@ -783,3 +783,20 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .cnode.prev .clabel { top: 0; transform: translate(-50%, -50%); color: #D6457A; }
 .cnode.gate.trophy .clabel { top: 70px; color: #D6457A; }
 .cnode.gate.trophy .cclear.done-all { top: 30px; left: 50%; width: 120px; height: 40px; transform: translate(-50%, -50%) rotate(-6deg); }
+
+/* ---------- 52. 다음 장으로 넘어가는 연출: 문에서 빛 · 반짝이 · 흰 화면 · 장 이름 ---------- */
+.cnode.gate .gate-twinkle { animation: twinkle 1200ms ease-in-out infinite; transform: translate(-50%, -50%); z-index: 4; }
+.cnode.gate .gate-burst { position: absolute; left: 50%; top: 50%; width: 80px; height: 80px; border-radius: 50%; transform: translate(-50%, -50%) scale(0.2); z-index: 5; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,245,200,0.95) 35%, rgba(255,230,140,0.5) 60%, rgba(255,230,140,0) 72%);
+  animation: gate-burst 900ms cubic-bezier(.2, .7, .3, 1) forwards; }
+@keyframes gate-burst { 0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.6; } 40% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(16); opacity: 0.95; } }
+.cnode.gate .gate-shoot { position: absolute; z-index: 6; animation: gate-shoot 800ms ease-out forwards; }
+@keyframes gate-shoot { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1) rotate(90deg); } }
+.chapter-flash { position: absolute; inset: 0; z-index: 50; background: #fff; opacity: 0; transition: opacity 700ms ease-in; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.chapter-flash.on { opacity: 1; pointer-events: auto; }
+.chapter-flash.off { opacity: 0; transition: opacity 800ms ease-out; pointer-events: none; }
+.chapter-flash .chapter-title { text-align: center; opacity: 0; transition: opacity 400ms ease 500ms; }
+.chapter-flash.on .chapter-title { opacity: 1; }
+.chapter-flash.off .chapter-title { opacity: 0; transition: opacity 300ms; }
+.chapter-flash .ch-no { font-family: var(--jua); font-size: 54px; color: #fff; -webkit-text-stroke: 7px #D6457A; paint-order: stroke fill; line-height: 1.1; }
+.chapter-flash .ch-name { font-family: var(--jua); font-size: 24px; color: #D6457A; margin-top: 6px; }
