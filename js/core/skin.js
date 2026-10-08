@@ -58,6 +58,7 @@ export const TINTS = {
   labelYellow: { hue: 44, setSat: 0.95, lum: 1.18 }, // 회색 라벨 pill → 노랑 (일차)
   labelBright: { lum: 1.18 },                         // 캔디맵 노드 이름표
   labelLock:  { sat: 0, lum: 1.08 },
+  labelPink:  { hue: 340, setSat: 0.78, keepLight: 0.8 },   // 열린 문 라벨("2장으로 ▶"): 갈색 테두리 → 분홍, 크림 바탕은 그대로
 };
 
 /** 어떤 요소에 어떤 스킨을 입힐지. 위에서부터 처음 맞는 규칙 하나만 적용. tints 도 처음 맞는 것 하나. */
@@ -69,6 +70,7 @@ const RULES = [
   { sel: '.profile .bar i',   skin: 'xpfill',  tints: [] },
   { sel: '.profile .bar',     skin: 'xptrack', tints: [] },
   { sel: '.profile',          skin: 'profile', tints: [] },
+  { sel: '.cnode.gate.gate-open .clabel', skin: 'xptrack', tints: [['*', 'labelPink']] },   // 열린 문: 분홍 테두리
   { sel: '.cnode.lock .clabel', skin: 'label',   tints: [['*', 'labelLock']] },   // 잠긴 노드 이름표: 회색 라벨
   { sel: '.cnode .clabel',     skin: 'xptrack', tints: [] },                     // 클리어·진행 중 노드 이름표: panel_xpbar_track
   { sel: '.book-page .head',  skin: 'header',  tints: [['*', 'headPink']] },   // 도감 제목: 헤더 알약을 분홍으로
