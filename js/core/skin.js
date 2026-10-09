@@ -20,11 +20,11 @@ const DPR = 3;            // 에셋이 @3x 라서 3배로 그린다 (소스 1px 
  *  k = 소스 px → 논리 px 배율. 기본 1/3(@3x). 작은 칸에 쓸 땐 더 작게.
  */
 export const SKINS = {
-  cta:      { src: 'btn/btn_cta.png',              mode: 'h', l: 180, r: 130 },
-  modal:    { src: 'btn/btn_modal.png',            mode: 'h', l: 160, r: 120 },
+  cta:      { src: 'btn/btn_cta.png',              mode: 'h', l: 180, r: 130, stretch: true, mid: [881, 901] },   // 가운데는 깨끗한 열을 늘려 채운다 (넓은 구간을 눌러 그리면 사파리에서 깨진다)
+  modal:    { src: 'btn/btn_modal.png',            mode: 'h', l: 160, r: 120, stretch: true, mid: [677, 697] },
   pill:     { src: 'panel/panel_currency_pill.png', mode: 'h', l: 140, r: 110, stretch: true, mid: [150, 158] },   // 가운데는 깨끗한 열(150~158)로 채움
   label:    { src: 'panel/panel_label_pill.png',   mode: 'h', l: 130, r: 100, stretch: true, mid: [140, 148] },
-  header:   { src: 'panel/panel_header_pill.png',  mode: 'h', l: 100, r: 100 },
+  header:   { src: 'panel/panel_header_pill.png',  mode: 'h', l: 100, r: 100, stretch: true, mid: [795, 815] },
   xptrack:  { src: 'panel/panel_xpbar_track.png',  mode: 'h', l: 140, r: 110, stretch: true, mid: [150, 158] },   // 가운데는 깨끗한 열로 (선 끊김·얼룩이 늘어나지 않게)
   xpfill:   { src: 'panel/panel_xpbar_fill.png',   mode: 'h', l: 140, r: 110, stretch: true, mid: [150, 158] },
   profile:  { src: 'panel/panel_profile.png',      mode: 'h', l: 138, r: 108 },   // 흰 외곽선 2배 버전 (build_ui.py build_profile_outline)
@@ -174,9 +174,34 @@ function spans(srcLen, a, b, dstLen, c, stretch = false) {
   return out;
 }
 
+/** 많이 줄여 그릴 때(원본의 1/2 미만) 한 번에 줄이면 사파리 캔버스가 계단·얼룩을 남긴다 → 절반씩 미리 줄인 사본을 쓴다 */
+const halfCache = new Map();
+function scaledSource(im, key, c) {
+  let cur = im, k = 1;
+  while (c * k < 0.5) {
+    const ck = key + '|half' + k;
+    let next = halfCache.get(ck);
+    if (!next) {
+      const sw = cur.naturalWidth || cur.width, sh = cur.naturalHeight || cur.height;
+      next = document.createElement('canvas'); next.width = Math.max(1, Math.round(sw / 2)); next.height = Math.max(1, Math.round(sh / 2));
+      const g = next.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.drawImage(cur, 0, 0, next.width, next.height);
+      halfCache.set(ck, next);
+    }
+    cur = next; k *= 2;
+  }
+  return { im: cur, k };
+}
+
 function compose(skin, tintName, w, h) {
-  const im = source(skin.src, tintName);
-  if (!im) return null;
+  const im0 = source(skin.src, tintName);
+  if (!im0) return null;
+  const SW0 = im0.naturalWidth || im0.width, SH0 = im0.naturalHeight || im0.height;
+  const W0 = Math.max(1, Math.round(w * DPR)), H0 = Math.max(1, Math.round(h * DPR));
+  const c0 = skin.mode === 'v' ? W0 / SW0 : skin.mode === 'h' ? H0 / SH0 : Math.min(W0 / SW0, H0 / SH0, (skin.k || 1 / 3) * DPR);
+  const { im, k } = scaledSource(im0, skin.src + '|' + (tintName || ''), c0);
+  // 줄인 사본을 쓰면 소스 좌표(l·t·r·b·mid)도 같은 비율로 줄여야 한다
+  if (k > 1) skin = Object.assign({}, skin, { l: skin.l / k, r: skin.r / k, t: skin.t / k, b: skin.b / k, k: (skin.k || 1 / 3) * k, mid: skin.mid ? [skin.mid[0] / k, skin.mid[1] / k] : undefined });
   const SW = im.naturalWidth || im.width, SH = im.naturalHeight || im.height;
   const W = Math.max(1, Math.round(w * DPR)), H = Math.max(1, Math.round(h * DPR));
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;

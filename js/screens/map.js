@@ -202,7 +202,7 @@ registerScreen('map', (root, params = {}) => {
       el('div.map-side', {},
         pill(img('jelly'), progress.jelly),
         el('div.map-tiles', {},
-          menuBtn(uiIcon('shop', 44), '상점', () => { sfx.tap(); go('shop'); }),   // 젤리로 코스튬 사기
+          shopBtn(),
           menuBtn(icon.book(44), '도감', () => { sfx.tap(); go('book'); }),
           menuBtn(icon.sticker(44), '스티커', () => { sfx.tap(); go('stickers'); }),
           snd))));
@@ -254,6 +254,16 @@ registerScreen('map', (root, params = {}) => {
       g.querySelector('.clabel').textContent = `${chapter + 1}장으로 ▶`;
       sfx.unlock(); buzz(20);
     }, 1350);
+  }
+
+  /** 상점 버튼 (젤리로 코스튬 사기). 위치는 조정 모드 '맵'의 상점 버튼 좌우/위아래 (원래 자리 기준) */
+  function shopBtn() {
+    const m = tune().map;
+    const b = menuBtn(uiIcon('shop', 44), '상점', () => { sfx.tap(); go('shop'); });
+    b.classList.add('shop-btn');
+    Object.assign(b.dataset, { tx: 'shopBtnX', ty: 'shopBtnY', tmode: 'plain' });
+    Object.assign(b.style, { position: 'relative', left: m.shopBtnX + 'px', top: m.shopBtnY + 'px' });
+    return b;
   }
 
   /** 왼쪽 위 프로필: 위치·크기·이름·게이지를 조정 모드 '맵'에서 (모든 챕터 공통) */

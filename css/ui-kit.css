@@ -838,10 +838,13 @@ body.tuning .shop-head { cursor: ns-resize; }
 /* 맵: 내 캐릭터 (사장님, 입은 옷) — 도전할 가게 옆, 가만히 서 있다 */
 .me-node { position: absolute; transform: translate(-50%, -100%); z-index: 3; cursor: pointer; filter: drop-shadow(0 3px 2px rgba(90,62,43,0.25)); }
 .me-node img { display: block; }
-/* 다음 가게 열림: 회색 알이 옅어지는 동안 과일 알이 같은 자리에서 차오른다 (겹쳐서 자연스럽게) */
-.unlock-ov.go .ball { animation: gray-out 700ms ease-in-out forwards; filter: drop-shadow(0 4px 3px rgba(90,62,43,0.25)); }
-@keyframes gray-out { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.06); } }
-.unlock-ov.go .lockico { animation: lock-pop 700ms cubic-bezier(.3, 0, .6, 1) forwards; }
-.cnode.born > .ball { animation: fruit-in 700ms ease-in-out both, node-boing 1100ms ease-in-out 900ms infinite, cnode-glow 1400ms ease-in-out 900ms infinite; transform-origin: 50% 90%; }
-.cnode .unlock-ov.go .ball { animation: gray-out 700ms ease-in-out forwards; }   /* 덮어 둔 회색 알만 (과일 알 규칙보다 우선) */
-@keyframes fruit-in { 0% { opacity: 0; transform: scale(0.94); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
+/* 다음 가게 열림: 회색 알(자물쇠 포함)만 보이다가, 사라지는 그 순간 과일 알이 나타난다 (0.3초, 같은 타이밍) */
+.cnode.pre > .ball { opacity: 0; animation: none; }
+.cnode .unlock-ov.go .ball { animation: gray-out 300ms ease-in forwards; }
+@keyframes gray-out { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.12); } }
+.cnode .unlock-ov.go .lockico { animation: lock-pop 500ms cubic-bezier(.3, 0, .6, 1) forwards; }
+.cnode.born > .ball { animation: fruit-in 300ms ease-out both, node-boing 1100ms ease-in-out 600ms infinite, cnode-glow 1400ms ease-in-out 600ms infinite; transform-origin: 50% 90%; }
+@keyframes fruit-in { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+.me-node { z-index: 8; }                                                        /* 내 캐릭터는 다른 알·라벨 위로 (옮겨도 안 가려진다) */
+.shop-scroll .shop-head { margin-top: 0; }
+.map-tiles .shop-btn { z-index: 2; }
