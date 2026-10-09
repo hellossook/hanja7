@@ -20,7 +20,7 @@ registerScreen('shop', (root, params = {}) => {
   // ---- 아래: 흰 상자 안 코스튬 목록 ----
   const head = el('div.shop-head', { 'data-ty': 'headY', 'data-tmode': 'plain', style: { marginTop: T.headY + 'px' } }, el('span', { text: '코스튬' }));
   const grid = el('div.shop-grid');
-  const box = el('div.shop-box', {}, head, el('div.shop-scroll', {}, grid));
+  const box = el('div.shop-box', { style: { marginTop: (T.awningH + 22) + 'px' } }, head, el('div.shop-scroll', {}, grid));   // 차양 아래로 (차양이 제목을 안 가리게)
   root.append(box);
 
   function refresh() {
