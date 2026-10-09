@@ -12,6 +12,7 @@ const SCENES = [
   { id: 'map4', name: '맵4', screen: 'map', state: 'ch4' },
   { id: 'map5', name: '맵5', screen: 'map', state: 'ch5' },
   { id: 'book', name: '도감', screen: 'book', state: '' },
+  { id: 'shop', name: '상점', screen: 'shop', state: '' },
   { id: 'game', name: '게임', screen: 'game', state: 'full' },
   { id: 'coat', name: '코팅 고르기', screen: 'game', state: 'jars' },
   { id: 'stir', name: '저어주기', screen: 'game', state: 'stir' },
@@ -105,6 +106,14 @@ const FIELDS = {
   gateLockSize: ['분홍 자물쇠 크기', 16, 120, '(px)'],
   owlX: ['복습 손님(판다) 좌우', 0, 340, '맵 그림 기준 (px). 판다를 끌어도 돼요. 왼쪽 절반이면 말풍선이 오른쪽에'],
   owlY: ['복습 손님(판다) 위아래', 0, 1180, '맵 그림 위에서 (px)'],
+  meDX: ['내 캐릭터 좌우', -150, 150, '맵 탭: 지금 도전할 가게 알에서 얼마나 옆에 (px). 끌어도 돼요'],
+  meDY: ['내 캐릭터 위아래', -150, 150, '알 가운데 기준 (px)'],
+  meSize: ['내 캐릭터 크기', 40, 140, '(px)'],
+  heroSize: ['사장님 크기', 150, 420, '상점 위 사장님 그림 폭 (px)'],
+  heroY: ['사장님 위아래', -120, 120, '아래쪽 기준에서 (px, 클수록 아래)'],
+  awningY: ['차양 위아래', 100, 400, '화면 위에서 (px). 차양을 끌어도 돼요'],
+  awningH: ['차양 높이', 20, 120, '(px)'],
+  headY: ['제목 위아래', -20, 60, '"코스튬" 제목 (px)'],
   camView: ['미리 볼 맵 화면', 0, 3, '조정 모드에서만: 0 = 진행 따라, 1 = 1~3번, 2 = 4~5번, 3 = 6번(챕터 1만)'],
   cam1Y: ['1~3번 화면 위치', 0, 700, '맵을 얼마나 내려서 보여 줄지 (px, 클수록 아래쪽). 528 = 맨 아래'],
   cam2Y: ['4~5번 화면 위치', 0, 700, '(px). 챕터 2~5는 여기가 맨 위(문)까지'],
@@ -214,7 +223,7 @@ function enableDrag() {
     const x = Math.round(right ? drag.x0 - dx : drag.x0 + dx), y = Math.round(drag.y0 + (e.clientY - drag.sy) / view.scale);
     const base = /--ct/.test(drag.node.style.top) ? '--ct' : '--safe-top';
     if (!drag.kx) { drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(${base}) + ${y}px)`; }
-    else if (drag.node.dataset.tx) { if (center) drag.node.style.left = `calc(50% + ${x}px)`; else drag.node.style[right ? 'right' : 'left'] = x + 'px'; drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(${base}) + ${y}px)`; }
+    else if (drag.node.dataset.tx) { if (center) drag.node.style.left = `calc(50% + ${x}px)`; else drag.node.style[right ? 'right' : 'left'] = (x + (+drag.node.dataset.toffx || 0)) + 'px'; drag.node.style.top = plain ? (y + drag.off) + 'px' : `calc(var(${base}) + ${y}px)`; }
     else if (drag.kx === 'potX') { drag.node.style.left = x + 'px'; drag.node.style.top = `calc(var(${base}) + ${y}px)`; }
     else if (drag.node.classList.contains('skewer-wrap')) { drag.node.style.left = `calc(50% + ${x}px)`; drag.node.style.top = y + 'px'; }
     else { drag.node.style.left = `calc(50% + ${x}px)`; drag.node.style.top = `calc(var(${base}) + ${y}px)`; }

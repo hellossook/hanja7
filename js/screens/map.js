@@ -134,6 +134,13 @@ registerScreen('map', (root, params = {}) => {
       go(s.learn ? 'learn' : 'game', { stageId: s.id });
     });
     world.append(node);
+    if (state === 'open' && currentId === s.id) {                        // 내 캐릭터(사장님, 입은 옷)가 도전할 가게 옆에 서 있다
+      const pm = tune().map;
+      const me = el('div.me-node', { 'data-tx': 'meDX', 'data-ty': 'meDY', 'data-tmode': 'plain', 'data-toff': y, 'data-toffx': x, style: { left: (x + pm.meDX) + 'px', top: (y + pm.meDY) + 'px' } },
+        img('char_boss', { style: { width: pm.meSize + 'px' } }));
+      me.addEventListener('click', () => { sfx.tap(); go('shop'); });
+      world.append(me);
+    }
   });
 
   // 맨 위: 다음 장으로 가는 커튼 문 (마지막 챕터는 트로피 = 완주)
@@ -195,7 +202,7 @@ registerScreen('map', (root, params = {}) => {
       el('div.map-side', {},
         pill(img('jelly'), progress.jelly),
         el('div.map-tiles', {},
-          menuBtn(el('div.shop-ico', {}, faceBadge('boss', 40, false, 'profile')), '상점', () => { sfx.tap(); go('shop'); }),   // 젤리로 코스튬 사기
+          menuBtn(uiIcon('shop', 44), '상점', () => { sfx.tap(); go('shop'); }),   // 젤리로 코스튬 사기
           menuBtn(icon.book(44), '도감', () => { sfx.tap(); go('book'); }),
           menuBtn(icon.sticker(44), '스티커', () => { sfx.tap(); go('stickers'); }),
           snd))));

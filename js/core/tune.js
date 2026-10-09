@@ -7,8 +7,9 @@ export const TUNE_DEFAULTS = {
               panelPadX: 18, panelPadTop: 22, sbX: 12, sbTop: 118, sbBottom: 12, scrollW: 6, labelY: 5, stickerScale: 74, hanjaScale: 84, hanjaFont: 56, hunSize: 30, tabSize: 58, tabGap: 12, hintSize: 13, hintGap: 10 },
   map:    { profX: 12, profY: 6, profW: 208, profH: 82, profAvatar: 60, nameSize: 14.5, nameX: 0, nameY: 0, barW: 0, barH: 14, barX: 0, barY: 0,
             n1X: 88, n1Y: 1080, n2X: 262, n2Y: 898, n3X: 72, n3Y: 640, n4X: 300, n4Y: 480, n5X: 320, n5Y: 330, n6X: 255, n6Y: 215, gateX: 182, gateY: 95, gateLockX: 33, gateLockY: 34, gateLockSize: 40,
-            cam1Y: 528, cam2Y: 333, cam3Y: 0, camView: 0, owlX: 300, owlY: 640 },
+            cam1Y: 528, cam2Y: 333, cam3Y: 0, camView: 0, owlX: 300, owlY: 640, meDX: -62, meDY: 4, meSize: 74 },
   book:   { sbX: 8, sbTop: 100, sbBottom: 26, scrollW: 6 },
+  shop:   { heroSize: 226, heroY: 0, awningY: 236, awningH: 58, headY: 8 },   // 상점: 사장님 크기·위치, 차양 위치·높이, '코스튬' 제목
   // 챕터 2~5 맵 (노드 5개 + 문). 처음 값은 길 모양에서 어림한 것 — 조정 모드 '맵2~5'에서 맞춘다
   map2:   { n1X: 203, n1Y: 950, n2X: 261, n2Y: 738, n3X: 107, n3Y: 537, n4X: 263, n4Y: 357, n5X: 224, n5Y: 266, gateX: 172, gateY: 92, gateLockX: 33, gateLockY: 34, gateLockSize: 40, prevX: 196, prevY: 1120,
             cam1Y: 528, cam2Y: 0, cam3Y: 0, camView: 0, owlX: 300, owlY: 640 },

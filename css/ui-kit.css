@@ -801,19 +801,20 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .chapter-flash .ch-no { font-family: var(--jua); font-size: 54px; color: #fff; -webkit-text-stroke: 7px #D6457A; paint-order: stroke fill; line-height: 1.1; }
 .chapter-flash .ch-name { font-family: var(--jua); font-size: 24px; color: #D6457A; margin-top: 6px; }
 
-/* ---------- 53. 상점 (S9): 사장님 코스튬 ---------- */
+/* ---------- 53. 상점 (S9): 사장님 코스튬 (2026-10-10 손봄: 흰 상자 · 과일 무늬 배경 · 차양 위치 조정) ---------- */
 .shop-screen { overflow: hidden; }
-.shop-banner { position: relative; flex: none; height: calc(var(--safe-top) + 250px); background: linear-gradient(180deg, #FFE3EE 0%, #FFD1E2 100%); overflow: hidden; }
-.shop-banner::before { content: ''; position: absolute; inset: 0; background: url('../assets/ui/bg/bg_sale.jpg') center 30% / cover no-repeat; opacity: 0.35; }
-.shop-hero { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: flex-end; }
-.shop-hero .hero { width: 230px; display: block; filter: drop-shadow(0 6px 6px rgba(120,60,80,0.2)); animation: float-y 2000ms ease-in-out infinite; }
-.shop-top { position: absolute; left: 16px; right: 16px; top: var(--safe-top); display: flex; justify-content: space-between; align-items: center; }
-.shop-awning { flex: none; height: 56px; margin-top: -12px; background: url('../assets/ui/panel/awning_strip.png') left top / auto 100% repeat-x; position: relative; z-index: 2; }
-.shop-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 16px calc(var(--safe-bottom) + 16px); scrollbar-width: none !important; }
+.shop-banner { position: relative; flex: none; background: url('../assets/ui/bg/bg_shop.jpg') center / cover no-repeat, #FDEEF5; overflow: visible; }
+.shop-hero { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; align-items: flex-end; z-index: 1; }
+.shop-hero .hero { display: block; filter: drop-shadow(0 6px 6px rgba(120,60,80,0.2)); }
+.shop-top { position: absolute; left: 16px; right: 16px; top: var(--safe-top); display: flex; justify-content: space-between; align-items: center; z-index: 3; }
+.shop-awning { position: absolute; left: -4px; right: -4px; background: url('../assets/ui/panel/awning_strip.png') left top / auto 100% repeat-x; z-index: 2; pointer-events: none; }
+body.tuning .shop-awning { pointer-events: auto; cursor: ns-resize; }
+.shop-box { position: relative; flex: 1; min-height: 0; margin: 18px 12px calc(var(--safe-bottom) + 10px); background: #fff; border-radius: 26px; box-shadow: 0 6px 0 rgba(230,120,160,0.18), inset 0 0 0 3px #FFE3EE; display: flex; flex-direction: column; padding: 0 10px 10px; }
+.shop-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 4px 8px; scrollbar-width: none !important; }
 #app .shop-scroll::-webkit-scrollbar { display: none !important; width: 0 !important; }
-.shop-head { position: relative; margin: 10px auto 14px; width: 220px; height: 42px; display: flex; align-items: center; justify-content: center; font-family: var(--jua); font-size: 20px; color: #fff; -webkit-text-stroke: 5px #D6457A; paint-order: stroke fill; }
-.shop-head .hi { position: absolute; left: -10px; top: -8px; width: 44px; height: 44px; transform: rotate(-12deg); filter: drop-shadow(0 2px 0 #fff); }
-.shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 10px; }
+.shop-head { position: relative; margin: -14px auto 12px; width: 210px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: var(--jua); font-size: 21px; color: #fff; -webkit-text-stroke: 5px #D6457A; paint-order: stroke fill; flex: none; z-index: 1; }
+body.tuning .shop-head { cursor: ns-resize; }
+.shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
 .shop-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 10px; min-height: 176px; }
 .shop-card.on { outline: 3px solid #FF8FB0; outline-offset: -3px; border-radius: 22px; }
 .shop-card .cname { font-family: var(--jua); font-size: 13px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -821,10 +822,14 @@ body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: ca
 .shop-card .cpic img { max-width: 100%; max-height: 100%; display: block; }
 .shop-card .btn.small { min-height: 36px; padding: 0 10px 2px; font-size: 15px; border-radius: 12px; -webkit-text-stroke-width: 3px; width: 100%; }
 .shop-card .btn .price { display: inline-flex; align-items: center; gap: 4px; }
-.shop-card .btn .price img { width: 20px; height: 20px; }
+.shop-card .btn .price .ui-icon { width: 20px; height: 20px; }
 .shop-dialog .dart img { display: block; margin: 0 auto; }
 .shop-dialog .dbody b { color: #D6457A; }
 .shop-dialog .muted { font-size: 14px; color: var(--ink2); }
-.map-tiles .shop-ico { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.shop-dialog .dbtn.two .btn { flex: 1; min-width: 0; }                   /* 두 버튼을 같은 폭으로 넓게 (좁으면 버튼 그림 가운데가 찌그러진다) */
 #app .map-tiles { gap: 2px; }
 #app .map-tiles .menu-btn { width: 46px; }
+/* 맵: 내 캐릭터 (사장님, 입은 옷) — 도전할 가게 옆 */
+.me-node { position: absolute; transform: translate(-50%, -100%); z-index: 3; cursor: pointer; filter: drop-shadow(0 3px 2px rgba(90,62,43,0.25)); }
+.me-node img { display: block; animation: float-y 1600ms ease-in-out infinite; }
+.shop-card .btn.small { white-space: nowrap; font-size: 14px; padding: 0 6px 2px; }

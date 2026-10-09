@@ -73,7 +73,8 @@ const RULES = [
   { sel: '.cnode.gate.gate-open .clabel, .cnode.prev .clabel', skin: 'xptrack', tints: [['*', 'labelPink']] },   // 열린 문("2장으로 ▶")·앞 장 문("◀ 1장"): 분홍 테두리
   { sel: '.cnode.lock .clabel', skin: 'label',   tints: [['*', 'labelLock']] },   // 잠긴 노드 이름표: 회색 라벨
   { sel: '.cnode .clabel',     skin: 'xptrack', tints: [] },                     // 클리어·진행 중 노드 이름표: panel_xpbar_track
-  { sel: '.book-page .head',  skin: 'header',  tints: [['*', 'headPink']] },   // 도감 제목: 헤더 알약을 분홍으로
+  { sel: '.book-page .head',  skin: 'header',  tints: [['*', 'headPink']] },
+  { sel: '.shop-head',        skin: 'header',  tints: [['*', 'headPink']] },   // 상점 '코스튬' 제목   // 도감 제목: 헤더 알약을 분홍으로
   { sel: '.book-count',       skin: 'header',  tints: [] },                     // 도감 아래 숫자: 헤더 알약 (파랑 그대로)
   { sel: '.note, .splash-tip, .owl-node .bub', skin: 'mission', tints: [['.mint', 'noteMint']] },
   { sel: '.dialog, .detail, .book-page', skin: 'card', tints: [] },
