@@ -824,10 +824,10 @@ body.tuning .shop-head { cursor: ns-resize; }
 .btn.small.pink { -webkit-text-stroke-color: #D6457A; text-shadow: 0 2px 0 rgba(170,40,100,0.3); }
 .shop-card .btn.small { min-height: 40px; padding: 0 6px 3px; font-size: 15px; width: 100%; white-space: nowrap; }
 .shop-card .btn .price { display: inline-flex; align-items: center; gap: 4px; }
-.shop-card .btn .price .ui-icon { width: 20px; height: 20px; }
-.shop-dialog { padding: 80px 24px 26px; gap: 8px; border-radius: 0; box-shadow: none; }        /* 사과 팝업 틀: 위 차양·사과 줄 아래부터 내용 */
+.shop-card .btn .price img { width: 22px; height: 22px; display: block; }
+.shop-dialog { padding: 96px 24px 40px; gap: 14px; border-radius: 0; box-shadow: none; }       /* 사과 팝업 틀: 위 차양·사과 줄 아래부터 내용. 위아래 여유 있게 */
 .shop-dialog .dtitle { font-size: 22px; }
-.shop-dialog .dart { margin: -4px 0 -6px; }
+.shop-dialog .dart { margin: 2px 0 0; }
 .shop-dialog .dtitle { color: #D6457A; }
 .shop-dialog .dart img { display: block; margin: 0 auto; }
 .shop-dialog .dbody b { color: #D6457A; }

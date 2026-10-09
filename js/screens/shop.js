@@ -1,5 +1,5 @@
 // S9 상점 — 젤리로 사장님 코스튬을 산다. 위: 사장님(입고 있는 옷) 배너 + 차양, 아래: 흰 상자 안 코스튬 카드 3열. 위치·크기는 조정 모드 '상점'
-import { el, img, go, registerScreen, button, backBtn, toast, bgLayer, sparkles, uiIcon } from '../core/ui.js';
+import { el, img, go, registerScreen, button, backBtn, toast, bgLayer, sparkles } from '../core/ui.js';
 import { tune } from '../core/tune.js';
 import { progress, buyCostume, wearCostume } from '../core/store.js';
 import { COSTUMES } from '../data/costumes.js';
@@ -33,7 +33,7 @@ registerScreen('shop', (root, params = {}) => {
         el('div.cpic', {}, img('char_costume:' + c.id)),
         wearing ? el('div.wearing', { text: '착용 중' })
           : owned ? button('착용', 'small mint', () => { wearCostume(c.id); sfx.pop(); buzz(10); refresh(); })
-          : button(el('span.price', {}, uiIcon('jelly_purple', 20), el('span', { text: String(c.price) })), 'small pink', () => confirmBuy(c)));
+          : button(el('span.price', {}, img('jelly'), el('span', { text: String(c.price) })), 'small', () => confirmBuy(c)));   // 살래요 버튼과 같은 모양·색, 젤리 아이콘은 원본
       grid.append(card);
     }
   }
