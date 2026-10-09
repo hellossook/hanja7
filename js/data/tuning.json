@@ -64,13 +64,26 @@
     "cam3Y": 0,
     "camView": 0,
     "owlX": 300,
-    "owlY": 640
+    "owlY": 640,
+    "meDX": -62,
+    "meDY": 4,
+    "meSize": 74,
+    "shopBtnX": 0,
+    "shopBtnY": 0
   },
   "book": {
     "sbX": 8,
     "sbTop": 100,
     "sbBottom": 26,
     "scrollW": 6
+  },
+  "shop": {
+    "heroSize": 234,
+    "heroX": 0,
+    "heroY": -21,
+    "awningY": 270,
+    "awningH": 58,
+    "headY": 24
   },
   "map2": {
     "n1X": 100,
