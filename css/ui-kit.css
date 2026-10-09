@@ -821,17 +821,18 @@ body.tuning .shop-head { cursor: ns-resize; }
 .shop-card .cpic { width: 92px; height: 92px; display: flex; align-items: flex-end; justify-content: center; }
 .shop-card .cpic img { max-width: 100%; max-height: 100%; display: block; }
 .shop-card .wearing { height: 36px; display: flex; align-items: center; justify-content: center; font-family: var(--jua); font-size: 15px; color: #D6457A; }
-.shop-screen .btn { color: #fff; -webkit-text-stroke: 3.5px #D6457A; paint-order: stroke fill; text-shadow: none; }
-.shop-screen .btn.mint { -webkit-text-stroke-color: #1E8C6B; }
-.shop-card .btn.small { min-height: 36px; padding: 0 6px 1px; font-size: 15px; border-radius: 18px; width: 100%; white-space: nowrap; }
+.btn.small.pink { -webkit-text-stroke-color: #D6457A; text-shadow: 0 2px 0 rgba(170,40,100,0.3); }
+.shop-card .btn.small { min-height: 40px; padding: 0 6px 3px; font-size: 15px; width: 100%; white-space: nowrap; }
 .shop-card .btn .price { display: inline-flex; align-items: center; gap: 4px; }
 .shop-card .btn .price .ui-icon { width: 20px; height: 20px; }
-.shop-dialog { padding: 86px 26px 30px; border-radius: 0; box-shadow: none; }                 /* 사과 팝업 틀: 위 차양·사과 줄 아래부터 내용 */
+.shop-dialog { padding: 80px 24px 26px; gap: 8px; border-radius: 0; box-shadow: none; }        /* 사과 팝업 틀: 위 차양·사과 줄 아래부터 내용 */
+.shop-dialog .dtitle { font-size: 22px; }
+.shop-dialog .dart { margin: -4px 0 -6px; }
 .shop-dialog .dtitle { color: #D6457A; }
 .shop-dialog .dart img { display: block; margin: 0 auto; }
 .shop-dialog .dbody b { color: #D6457A; }
 .shop-dialog .muted { font-size: 14px; color: var(--ink2); }
-.shop-dialog .dbtn.two .btn { flex: 1; min-width: 0; min-height: 46px; font-size: 20px; }
+.shop-dialog .dbtn.two .btn { flex: 1; min-width: 0; min-height: 50px; font-size: 20px; }
 #app .map-tiles { gap: 2px; }
 #app .map-tiles .menu-btn { width: 46px; }
 /* 맵: 내 캐릭터 (사장님, 입은 옷) — 도전할 가게 옆, 가만히 서 있다 */

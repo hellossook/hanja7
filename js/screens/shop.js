@@ -34,7 +34,7 @@ registerScreen('shop', (root, params = {}) => {
         el('div.cpic', {}, img('char_costume:' + c.id)),
         wearing ? el('div.wearing', { text: '착용 중' })
           : owned ? button('착용', 'small mint', () => { wearCostume(c.id); sfx.pop(); buzz(10); refresh(); })
-          : button(el('span.price', {}, uiIcon('jelly_purple', 20), el('span', { text: String(c.price) })), 'small buy', () => confirmBuy(c)));
+          : button(el('span.price', {}, uiIcon('jelly_purple', 20), el('span', { text: String(c.price) })), 'small pink', () => confirmBuy(c)));
       grid.append(card);
     }
   }
@@ -44,9 +44,9 @@ registerScreen('shop', (root, params = {}) => {
     ov.append(el('div.scrim', { onClick: () => ov.remove() }));
     const dlg = el('div.dialog.shop-dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 110px)' } },
       el('div.dtitle', { text: c.name }),
-      el('div.dart', {}, img('char_costume:' + c.id, { style: { width: '150px' } })),
+      el('div.dart', {}, img('char_costume:' + c.id, { style: { width: '180px' } })),   // 1.2배
       el('div.dbody', { html: `젤리 <b>${c.price}</b>개로 살까요?<br><span class="muted">가지고 있는 젤리 ${progress.jelly}개</span>` }),
-      el('div.dbtn.two', {}, button('아니요', 'small mint', () => { sfx.tap(); ov.remove(); }), button('살래요', 'small', () => {
+      el('div.dbtn.two', {}, button('아니요', 'small', () => { sfx.tap(); ov.remove(); }), button('살래요', 'small pink', () => {
         if (!buyCostume(c.id, c.price)) { sfx.wrong(); toast('젤리가 모자라요. 탕후루를 더 팔아요!'); return; }
         ov.remove(); sfx.jelly(); buzz(20);
         refresh();

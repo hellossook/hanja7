@@ -60,6 +60,7 @@ export const TINTS = {
   labelBright: { lum: 1.18 },                         // 캔디맵 노드 이름표
   labelLock:  { sat: 0, lum: 1.08 },
   labelPink:  { hue: 340, setSat: 0.78, keepLight: 0.8 },
+  ctaPink:    { hue: 335, setSat: 0.78, lum: 1.06 },            // 버튼 → 분홍 (상점 구매)
   pillRose:   { hue: 340, setSat: 0.9, keepLight: 0.74 },     // 상점 버튼: 분홍 알약
   pillGreen:  { hue: 150, setSat: 0.7, keepLight: 0.74 },     // 상점 '착용' 버튼: 민트 알약   // 열린 문 라벨("2장으로 ▶"): 갈색 테두리 → 분홍, 크림 바탕은 그대로
 };
@@ -67,9 +68,8 @@ export const TINTS = {
 /** 어떤 요소에 어떤 스킨을 입힐지. 위에서부터 처음 맞는 규칙 하나만 적용. tints 도 처음 맞는 것 하나. */
 const RULES = [
   { sel: '.speech',           skin: 'speech',  tints: [] },
-  { sel: '.shop-screen .btn', skin: 'pill',    tints: [['.mint', 'pillGreen'], ['*', 'pillRose']] },   // 상점 버튼: 알약 (가운데가 깨끗한 열이라 안 뿌옇다)
   { sel: '.shop-dialog',      skin: 'shopPopup', tints: [] },
-  { sel: '.btn.small',        skin: 'modal',   tints: [['.disabled', 'gray'], ['.yellow', 'ctaOrange'], ['.mint', 'ctaMint']] },
+  { sel: '.btn.small',        skin: 'modal',   tints: [['.disabled', 'gray'], ['.yellow', 'ctaOrange'], ['.mint', 'ctaMint'], ['.pink', 'ctaPink']] },
   { sel: '.btn',              skin: 'cta',     tints: [['.disabled', 'gray'], ['.yellow', 'ctaOrange'], ['.mint', 'ctaMint']] },
   { sel: '.pill',             skin: 'pill',    tints: [['.yellow', 'pillYellow'], ['.sticker', 'pillSticker'], ['.mint', 'pillMint'], ['.sky', null], ['*', 'pillPink']] },
   { sel: '.profile .bar i',   skin: 'xpfill',  tints: [] },
