@@ -30,6 +30,7 @@ export const SKINS = {
   profile:  { src: 'panel/panel_profile.png',      mode: 'h', l: 138, r: 108 },   // 흰 외곽선 2배 버전 (build_ui.py build_profile_outline)
   mission:  { src: 'panel/panel_mission.png',      mode: '9', l: 210, t: 180, r: 120, b: 110 },
   card:     { src: 'panel/panel_modal_card.png',   mode: '9', l: 130, t: 130, r: 90,  b: 110 },
+  shopPopup:{ src: 'panel/panel_shop_popup.png',  mode: '9', l: 90, t: 300, r: 90, b: 100 },   // 상점 구매 팝업 (위 차양·사과 줄은 안 늘림)
   product:  { src: 'panel/panel_product_card.png', mode: '9', l: 140, t: 140, r: 90,  b: 110, k: 0.16 },
   chat:     { src: 'panel/panel_chat_bubble.png',  mode: '9', l: 110, t: 70,  r: 70,  b: 85, k: 0.22 },
   speech:   { src: 'panel/panel_chat_bubble_2_body.png', mode: '9', l: 110, t: 70, r: 110, b: 85 },   // 손님 말풍선 몸통 (꼬리는 CSS 로 하나만 얹는다)
@@ -58,12 +59,16 @@ export const TINTS = {
   labelYellow: { hue: 44, setSat: 0.95, lum: 1.18 }, // 회색 라벨 pill → 노랑 (일차)
   labelBright: { lum: 1.18 },                         // 캔디맵 노드 이름표
   labelLock:  { sat: 0, lum: 1.08 },
-  labelPink:  { hue: 340, setSat: 0.78, keepLight: 0.8 },   // 열린 문 라벨("2장으로 ▶"): 갈색 테두리 → 분홍, 크림 바탕은 그대로
+  labelPink:  { hue: 340, setSat: 0.78, keepLight: 0.8 },
+  pillRose:   { hue: 340, setSat: 0.9, keepLight: 0.74 },     // 상점 버튼: 분홍 알약
+  pillGreen:  { hue: 150, setSat: 0.7, keepLight: 0.74 },     // 상점 '착용' 버튼: 민트 알약   // 열린 문 라벨("2장으로 ▶"): 갈색 테두리 → 분홍, 크림 바탕은 그대로
 };
 
 /** 어떤 요소에 어떤 스킨을 입힐지. 위에서부터 처음 맞는 규칙 하나만 적용. tints 도 처음 맞는 것 하나. */
 const RULES = [
   { sel: '.speech',           skin: 'speech',  tints: [] },
+  { sel: '.shop-screen .btn', skin: 'pill',    tints: [['.mint', 'pillGreen'], ['*', 'pillRose']] },   // 상점 버튼: 알약 (가운데가 깨끗한 열이라 안 뿌옇다)
+  { sel: '.shop-dialog',      skin: 'shopPopup', tints: [] },
   { sel: '.btn.small',        skin: 'modal',   tints: [['.disabled', 'gray'], ['.yellow', 'ctaOrange'], ['.mint', 'ctaMint']] },
   { sel: '.btn',              skin: 'cta',     tints: [['.disabled', 'gray'], ['.yellow', 'ctaOrange'], ['.mint', 'ctaMint']] },
   { sel: '.pill',             skin: 'pill',    tints: [['.yellow', 'pillYellow'], ['.sticker', 'pillSticker'], ['.mint', 'pillMint'], ['.sky', null], ['*', 'pillPink']] },

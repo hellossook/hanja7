@@ -12,7 +12,7 @@ registerScreen('shop', (root, params = {}) => {
   // ---- 위: 배너 (과일 무늬 배경 + 사장님 + 젤리) ----
   const jellyTxt = el('span.txt', { text: String(progress.jelly) });
   const hero = img('char_boss', { class: 'hero', style: { width: T.heroSize + 'px', transform: `translateY(${T.heroY}px)` } });
-  const banner = el('div.shop-banner', { style: { height: `calc(var(--safe-top) + ${T.awningY - 12}px)` } },
+  const banner = el('div.shop-banner', { style: { height: `calc(var(--safe-top) + ${T.awningY + T.awningH / 2}px)` } },   // 차양 뒤까지 → 차양과 붙어 있다
     el('div.shop-hero', {}, hero),
     el('div.shop-top', {}, backBtn(() => go('map'), 50), el('div.pill.pink', {}, el('div.ico', {}, img('jelly')), jellyTxt)));
   const awning = el('div.shop-awning', { 'data-ty': 'awningY', style: { top: `calc(var(--safe-top) + ${T.awningY}px)`, height: T.awningH + 'px' } });
@@ -20,7 +20,7 @@ registerScreen('shop', (root, params = {}) => {
   // ---- 아래: 흰 상자 안 코스튬 목록 ----
   const head = el('div.shop-head', { 'data-ty': 'headY', 'data-tmode': 'plain', style: { marginTop: T.headY + 'px' } }, el('span', { text: '코스튬' }));
   const grid = el('div.shop-grid');
-  const box = el('div.shop-box', { style: { marginTop: (T.awningH + 22) + 'px' } }, head, el('div.shop-scroll', {}, grid));   // 차양 아래로 (차양이 제목을 안 가리게)
+  const box = el('div.shop-box', { style: { paddingTop: (T.awningH / 2 + 14) + 'px' } }, head, el('div.shop-scroll', {}, grid));   // 흰 바탕 (차양 아래부터 끝까지)
   root.append(box);
 
   function refresh() {
@@ -32,8 +32,9 @@ registerScreen('shop', (root, params = {}) => {
       const card = el('div.shop-card' + (wearing ? '.on' : ''), {},
         el('div.cname', { text: c.name }),
         el('div.cpic', {}, img('char_costume:' + c.id)),
-        owned ? button(wearing ? '착용 중' : '착용', wearing ? 'small disabled' : 'small mint', () => { wearCostume(c.id); sfx.pop(); buzz(10); refresh(); })
-              : button(el('span.price', {}, uiIcon('jelly_purple', 20), el('span', { text: String(c.price) })), 'small yellow', () => confirmBuy(c)));
+        wearing ? el('div.wearing', { text: '착용 중' })
+          : owned ? button('착용', 'small mint', () => { wearCostume(c.id); sfx.pop(); buzz(10); refresh(); })
+          : button(el('span.price', {}, uiIcon('jelly_purple', 20), el('span', { text: String(c.price) })), 'small buy', () => confirmBuy(c)));
       grid.append(card);
     }
   }
@@ -45,7 +46,7 @@ registerScreen('shop', (root, params = {}) => {
       el('div.dtitle', { text: c.name }),
       el('div.dart', {}, img('char_costume:' + c.id, { style: { width: '150px' } })),
       el('div.dbody', { html: `젤리 <b>${c.price}</b>개로 살까요?<br><span class="muted">가지고 있는 젤리 ${progress.jelly}개</span>` }),
-      el('div.dbtn.two', {}, button('아니요', 'small', () => { sfx.tap(); ov.remove(); }), button('살래요', 'yellow small', () => {
+      el('div.dbtn.two', {}, button('아니요', 'small mint', () => { sfx.tap(); ov.remove(); }), button('살래요', 'small', () => {
         if (!buyCostume(c.id, c.price)) { sfx.wrong(); toast('젤리가 모자라요. 탕후루를 더 팔아요!'); return; }
         ov.remove(); sfx.jelly(); buzz(20);
         refresh();
