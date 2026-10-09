@@ -3,6 +3,7 @@ import { el, img, icon, go, registerScreen, pill, faceBadge, backBtn, toast } fr
 import { tune } from '../core/tune.js';
 import { progress, save, addWallSticker, removeWallSticker, stageState } from '../core/store.js';
 import { STAGES, STAGE_CHARS } from '../data/stages.js';
+import { COSTUMES } from '../data/costumes.js';
 import { toLogical, logicalRect, view } from '../core/scale.js';
 import { renderWall, stickerEl, stickerName, baseSize } from '../wall.js';
 import { sfx, buzz } from '../core/audio.js';
@@ -45,7 +46,10 @@ registerScreen('stickers', (root, params = {}) => {
   const learned = () => Object.keys(progress.chars);                        // 공부한 한자
   /** 스티커 상자: 캐릭터 18종 + 공부한 한자. 몇 장이든 붙일 수 있다 (끌어다 놓을 때마다 새로 만든다) */
   /** 캐릭터 스티커: 스테이지마다 손님 한 명. 그 스테이지를 클리어해야 붙일 수 있고, 아직이면 잠김 (스테이지 목록: data/stages.js STAGE_CHARS) */
-  const charItems = () => STAGES.filter(s => STAGE_CHARS[s.id]).map((s, si) => ({ kind: 'char', id: STAGE_CHARS[s.id], virtual: true, lock: !stageState(s.id).cleared, stage: `${si + 1}. ${s.name}` }));
+  const charItems = () => [
+    ...STAGES.filter(s => STAGE_CHARS[s.id]).map((s, si) => ({ kind: 'char', id: STAGE_CHARS[s.id], virtual: true, lock: !stageState(s.id).cleared, stage: `${si + 1}. ${s.name}` })),
+    ...COSTUMES.filter(c => c.id !== 'default' && progress.costumes.includes(c.id)).map(c => ({ kind: 'char', id: c.id, virtual: true, lock: false })),   // 상점에서 산 코스튬도 스티커
+  ];
   const openChars = () => charItems().filter(c => !c.lock).length;
   const trayItems = () => [                                  // 붙일 수 있는 것 먼저, 잠긴 캐릭터는 맨 뒤
     ...(filter !== 'hanja' ? charItems().filter(c => !c.lock) : []),

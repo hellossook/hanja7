@@ -848,3 +848,4 @@ body.tuning .shop-head { cursor: ns-resize; }
 .me-node { z-index: 8; }                                                        /* 내 캐릭터는 다른 알·라벨 위로 (옮겨도 안 가려진다) */
 .shop-scroll .shop-head { margin-top: 0; }
 .map-tiles .shop-btn { z-index: 2; }
+.shop-dialog .dbtn.two { gap: 6px; }

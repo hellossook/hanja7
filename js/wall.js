@@ -2,6 +2,7 @@
 import { el, img } from './core/ui.js';
 import { progress } from './core/store.js';
 import { STICKER_BY_ID, CUSTOMERS } from './data/stages.js';
+import { COSTUME_BY_ID } from './data/costumes.js';
 import { BY_ID, displayHunEum } from './data/hanja.js';
 import { CHAR_STICKERS } from './data/charStickers.js';
 const CHAR_BY_ID = Object.fromEntries(CHAR_STICKERS.map(c => [c.id, c]));
@@ -35,7 +36,7 @@ export function stickerEl(inst, size) {
 export function stickerName(inst) {
   if (inst.kind === 'cust') { const { customer } = parseCust(inst.id); return `${CUSTOMERS[customer] || ''} 스티커`; }
   if (inst.kind === 'hanja') { const c = BY_ID[inst.id]; return c ? displayHunEum(c) : inst.id; }
-  if (inst.kind === 'char') return (CHAR_BY_ID[inst.id] || {}).name || '';
+  if (inst.kind === 'char') return (CHAR_BY_ID[inst.id] || COSTUME_BY_ID[inst.id] || {}).name || '';   // 손님 캐릭터 또는 산 코스튬
   const s = STICKER_BY_ID[inst.id];
   return s ? s.name : '';
 }
