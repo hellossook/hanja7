@@ -68,9 +68,9 @@
     "camView": 0,
     "owlX": 300,
     "owlY": 640,
-    "meDX": -62,
-    "meDY": 4,
-    "meSize": 74,
+    "meDX": -77,
+    "meDY": 30,
+    "meSize": 100,
     "shopBtnX": 48,
     "shopBtnY": -52
   },
@@ -152,9 +152,9 @@
     "camView": 0,
     "owlX": 104,
     "owlY": 428,
-    "meDX": -62,
-    "meDY": 4,
-    "meSize": 74
+    "meDX": -77,
+    "meDY": 30,
+    "meSize": 100
   },
   "map4": {
     "n1X": 280,
@@ -183,9 +183,9 @@
     "camView": 0,
     "owlX": 106,
     "owlY": 857,
-    "meDX": -62,
-    "meDY": 4,
-    "meSize": 74
+    "meDX": -77,
+    "meDY": 30,
+    "meSize": 100
   },
   "map5": {
     "n1X": 124,
@@ -214,9 +214,9 @@
     "camView": 0,
     "owlX": 22,
     "owlY": 396,
-    "meDX": -62,
-    "meDY": 4,
-    "meSize": 74
+    "meDX": -77,
+    "meDY": 30,
+    "meSize": 100
   },
   "game": {
     "fruitSize": 127,
