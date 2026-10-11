@@ -35,6 +35,7 @@ export function runDemo(q) {
   const routes = {
     splash: () => go('splash'),
     map: () => go('map', { demoDialog: state === 'dialog', chapter: state.startsWith('ch') ? Number(state.slice(2)) : undefined }),   // state=ch3 → 3장 맵
+    master: () => { go('map', { chapter: 5 }); import('../screens/map.js').then(m => setTimeout(() => m.masterDialog(document.querySelector('.screen')), 400)); },   // 7급 완주 축하 팝업
     learn: () => go('learn', { stageId: '1-2', demoExpanded: state === 'expanded' }),
     game: () => go('game', { stageId: '1-2', demo: state || 'A' }),
     result: () => go('result', { stageId: '1-2', stars: 2, jelly: 52, firstTry: 12, wrongIds: ['川', '地'], unlock: { type: 'coat', id: 'choco' }, last, demoReward: state === 'reward',

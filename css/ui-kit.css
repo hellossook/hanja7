@@ -424,7 +424,7 @@
 
 /* ---------- 30. 캔디맵 (2026-09-27 다른 세션에서 만든 새 맵 — 노드는 설탕 코팅 과일 알) ---------- */
 /* 배경 bg_map_candy.jpg 393x1180. 노드 = 설탕 코팅 과일 알(assets/ui/map/) */
-.map-world { height: 1380px; background: #CFCDFC; }
+.map-world { height: 1495px; background: #CFCDFC; }
 .map-legend { display: none; }                                   /* 캔디맵은 범례 불필요 */
 .cnode { position: absolute; width: 66px; height: 66px; margin: -33px 0 0 -33px; cursor: pointer; transition: transform 120ms; }
 .cnode:active { transform: scale(0.94); }
@@ -707,7 +707,7 @@ body.bleed #app { overflow: visible; }
 body.bleed .screen::before { content: ''; position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: inherit; z-index: -2; pointer-events: none; }
 body.bleed .map-scroll { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 body.bleed .map-world { margin-left: var(--bleed); }
-body.bleed .map-world::before { content: ''; position: absolute; top: 200px; height: 1180px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: var(--map-bg, url('../assets/ui/map/bg_map_candy.jpg')) center top / 100% 100%; filter: blur(6px) saturate(1.05); opacity: 0.9; }
+body.bleed .map-world::before { content: ''; position: absolute; top: 200px; height: 1295px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); background: var(--map-bg, url('../assets/ui/map/bg_map_candy.jpg')) center top / 100% 100%; filter: blur(6px) saturate(1.05); opacity: 0.9; }
 body.bleed .bg-layer { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 body.bleed .stickers-screen .wall-box, body.bleed .screen > .wall-box { left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); }
 
@@ -855,3 +855,12 @@ body.tuning .shop-head { cursor: ns-resize; }
 .shop-card .btn.small, .shop-card .wearing { transform: translate(var(--btn-x, 0px), var(--btn-y, 0px)); }
 .cnode.gate.gate-glow-node { cursor: pointer; }
 .cnode.gate.gate-glow-node .clabel { display: none; }
+
+/* ---------- 54. 7급 완주 축하 팝업 ---------- */
+.master-dialog .dtitle { font-size: 26px; color: #D6457A; }
+.master-dialog .master-art { position: relative; width: 190px; height: 190px; display: flex; justify-content: center; align-items: flex-end; }
+.master-dialog .master-art .me { width: 160px; display: block; animation: boing 1300ms ease-in-out infinite; }
+.master-dialog .dbody b { color: #D6457A; }
+.master-dialog .muted { font-size: 14px; color: var(--ink2); }
+.master-ov .confetti { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 3px; opacity: 0.95; animation: confetti-fall linear forwards; z-index: 22; pointer-events: none; }
+@keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(900px) rotate(540deg); opacity: 0.6; } }

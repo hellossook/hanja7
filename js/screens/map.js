@@ -7,7 +7,7 @@ import { box0Ids, reviewSet } from '../quiz.js';
 import { BY_ID, displayHunEum } from '../data/hanja.js';
 import { sfx, setSound, buzz } from '../core/audio.js';
 import { profileCard } from './title.js';
-import { save, resetProgress } from '../core/store.js';
+import { save, resetProgress, addJelly } from '../core/store.js';
 
 // 챕터마다 맵 그림이 다르다 (CHAPTERS). 노드 위치는 js/data/tuning.json 의 그 챕터 장면(map, map2…)에 — 조정 모드에서 끌어 옮긴다
 // 과일 알: 8급 = 딸기, 챕터 안 1~5번째 = 귤·청포도·블루베리·키위·포도 (같은 그림을 챕터마다 다시 쓴다)
@@ -16,7 +16,8 @@ const BALL_COLOR = { straw: '#F0363C', orange: '#F6A62C', muscat: '#A8E752', blu
 const BALL_LOCK = { straw: 'pink', orange: 'blue', muscat: 'green', blue: 'orange', kiwi: 'purple', grape: 'silver' };
 const LOCK_GRAY = '#B5B2AE';
 const lastCamBy = {};   // 챕터별 지난번 맵 화면 위치 (구간이 바뀌면 거기서부터 움직인다)
-const PAD = 200;   // 헤더에 가려지는 만큼 위쪽 여백 (맵 세로 = 1180 + PAD)
+const PAD = 200;   // 헤더에 가려지는 만큼 위쪽 여백 (맵 세로 = MAP_H + PAD)
+const MAP_H = 1295;   // 맵 그림 세로 (682×2248 → 393 폭 기준). 2026-10-12: 위 하늘 116px 늘림
 const MAP = 'assets/ui/map/';
 function mapImg(name, cls) { return el('img', { src: MAP + name + '.png', alt: '', class: cls }); }
 
@@ -48,6 +49,29 @@ export function reviewDialog(root, demoIds) {
     el('div.dbtn', {}, button('복습하기', '', () => go('game', { review: ids, bonus: true })), img('sticker_ribbon', { class: 'gift' })));
   ov.append(dlg);
   root.append(ov);
+  return ov;
+}
+
+/** 7급 완주 축하 팝업 (마지막 스테이지를 깨고 맵에 돌아오면 한 번) */
+export function masterDialog(root) {
+  progress.masterShown = true; addJelly(100); save();
+  const ov = el('div.overlay.master-ov');
+  const dlg = el('div.dialog.master-dialog.pop-in', { style: { top: 'calc(var(--safe-top) + 70px)' } },
+    el('div.dtitle', { html: '7급의 달인이<br>되셨군요!' }),
+    el('div.dart.master-art', {}, img('char_boss', { class: 'me' }),
+      ...[[0, 20, '#FFD84F', 0], [160, 0, '#fff', 200], [10, 150, '#fff', 400], [170, 130, '#FFD84F', 600], [90, -10, '#FFE9A8', 300]].map(([x, y, c, d]) =>
+        el('div.sparkle', { style: { left: x + 'px', top: y + 'px', animationDelay: d + 'ms' } }, icon.sparkle(22, c)))),
+    el('div.dbody', { html: `한자 100자를 모두 익히고<br>가게도 손님으로 가득!<br><b>${progress.shopName}</b> 사장님, 축하드려요~<br><span class="muted">축하 젤리 100개를 드렸어요</span>` }),
+    el('div.dbtn', {}, button('고마워요!', 'yellow', () => { sfx.tap(); ov.remove(); })));
+  ov.append(el('div.scrim'), dlg);
+  root.append(ov);
+  sfx.clear(); setTimeout(() => sfx.jelly(), 600);
+  // 색종이 비
+  const colors = ['#FF8FB0', '#FFD84F', '#7FD8FF', '#A8E752', '#C58CFF'];
+  for (let i = 0; i < 26; i++) {
+    const p = el('div.confetti', { style: { left: (8 + Math.random() * 377) + 'px', background: colors[i % colors.length], animationDelay: (Math.random() * 1400) + 'ms', animationDuration: (1800 + Math.random() * 1200) + 'ms', transform: `rotate(${Math.random() * 360}deg)` } });
+    ov.append(p);
+  }
   return ov;
 }
 
@@ -98,8 +122,8 @@ registerScreen('map', (root, params = {}) => {
 
   const scroll = el('div.map-scroll');
   const world = el('div.map-world.candy');
-  world.style.setProperty('--map-bg', `url('${MAP + CH.map}')`);
-  world.append(el('img', { src: MAP + CH.map, alt: '', class: 'bg', style: { position: 'absolute', left: 0, top: PAD + 'px', width: '393px', height: '1180px' } }));
+  world.style.setProperty('--map-bg', `url('${MAP + CH.map}')`); world.style.height = (MAP_H + PAD) + 'px';
+  world.append(el('img', { src: MAP + CH.map, alt: '', class: 'bg', style: { position: 'absolute', left: 0, top: PAD + 'px', width: '393px', height: MAP_H + 'px' } }));
 
   let currentId = null;
   const nextOfPending = pending ? STAGE_ORDER[STAGE_ORDER.indexOf(pending) + 1] : null;
@@ -290,7 +314,7 @@ registerScreen('map', (root, params = {}) => {
   }
 
   setTimeout(() => {
-    const max = Math.max(0, 1180 + PAD - scroll.clientHeight);
+    const max = Math.max(0, MAP_H + PAD - scroll.clientHeight);
     const to = Math.max(0, Math.min(max, tm['cam' + view + 'Y']));
     const last = lastCamBy[chapter];
     const from = last == null || tuneMode ? to : last;   // 조정 모드에서는 바로 그 화면으로
@@ -303,6 +327,8 @@ registerScreen('map', (root, params = {}) => {
       requestAnimationFrame(step);
     }
     if (pending && STAGE_BY_ID[pending].chapter === chapter) playClearFx();
+    const lastAll = STAGE_ORDER[STAGE_ORDER.length - 1];
+    if (!progress.masterShown && stageState(lastAll).cleared && chapter === CHAPTERS.length) setTimeout(() => masterDialog(root), pending ? 2600 : 600);   // 7급 완주 축하 (한 번)
     if (params.demoDialog) reviewDialog(root, reviewSet().wrong.length ? null : ['天', '地', '川', '海', '林']);
   }, 0);
 });
