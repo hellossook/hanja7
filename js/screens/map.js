@@ -164,7 +164,13 @@ registerScreen('map', (root, params = {}) => {
     world.append(node);
     if (allClear ? si === stages.length - 1 : (state === 'open' && currentId === s.id)) {   // 내 캐릭터(사장님, 입은 옷)가 도전할 가게 옆에 서 있다 (다 깬 상태로 보기: 마지막 알 옆)
       const pm = tm.meDX != null ? tm : tune().map;                      // 내 캐릭터 위치·크기: 이 챕터 장면(맵2~5)에서, 없으면 맵 탭 값
-      const me = el('div.me-node', { 'data-tx': 'meDX', 'data-ty': 'meDY', 'data-tmode': 'plain', 'data-toff': y, 'data-toffx': x, style: { left: (x + pm.meDX) + 'px', top: (y + pm.meDY) + 'px' } },
+      // 화면 밖으로 나가 잘리면 반대쪽으로 옮기고, 그래도 넘치면 안쪽으로 밀어 넣는다
+      const half = pm.meSize / 2 + 6;
+      let mx = x + pm.meDX;
+      if (mx - half < 0 || mx + half > 393) mx = x - pm.meDX;
+      mx = Math.max(half, Math.min(393 - half, mx));
+      const my = Math.max(pm.meSize + 10, Math.min(MAP_H + PAD - 4, y + pm.meDY));
+      const me = el('div.me-node', { 'data-tx': 'meDX', 'data-ty': 'meDY', 'data-tmode': 'plain', 'data-toff': y, 'data-toffx': x, style: { left: mx + 'px', top: my + 'px' } },
         img('char_boss', { style: { width: pm.meSize + 'px' } }));
       me.addEventListener('click', () => { sfx.tap(); go('shop'); });
       world.append(me);
