@@ -120,7 +120,10 @@
     "cam3Y": 0,
     "camView": 0,
     "owlX": 98,
-    "owlY": 816
+    "owlY": 816,
+    "meDX": -77,
+    "meDY": 30,
+    "meSize": 100
   },
   "map3": {
     "n1X": 79,
@@ -148,7 +151,10 @@
     "cam3Y": 0,
     "camView": 0,
     "owlX": 104,
-    "owlY": 428
+    "owlY": 428,
+    "meDX": -62,
+    "meDY": 4,
+    "meSize": 74
   },
   "map4": {
     "n1X": 280,
@@ -176,7 +182,10 @@
     "cam3Y": 0,
     "camView": 0,
     "owlX": 106,
-    "owlY": 857
+    "owlY": 857,
+    "meDX": -62,
+    "meDY": 4,
+    "meSize": 74
   },
   "map5": {
     "n1X": 124,
@@ -204,7 +213,10 @@
     "cam3Y": 0,
     "camView": 0,
     "owlX": 22,
-    "owlY": 396
+    "owlY": 396,
+    "meDX": -62,
+    "meDY": 4,
+    "meSize": 74
   },
   "game": {
     "fruitSize": 127,
