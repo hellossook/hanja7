@@ -212,7 +212,7 @@ registerScreen('map', (root, params = {}) => {
 
   // 카메라: 1~3번은 아래, 4~5번은 가운데(챕터 1은 6번이 맨 위). 다 깼으면 맨 위(문)
   const ci = currentId ? stages.findIndex(s => s.id === currentId) + 1 : (chapterDone ? stages.length + 1 : 1);   // 다 깼으면 맨 위(문), 아직 못 온 챕터면 아래
-  const autoView = chapter === 1 ? (ci <= 3 ? 1 : ci <= 5 ? 2 : 3) : (ci <= 3 ? 1 : 2);
+  const autoView = ci <= 3 ? 1 : ci <= 5 ? 2 : 3;   // 1~3번 → 아래, 4~5번 → 가운데(2~5장은 문까지), 다 깼으면 맨 위(cam3Y)
   const view = tuneMode && tm.camView ? tm.camView : autoView;
 
   // 복습 손님 (판다)

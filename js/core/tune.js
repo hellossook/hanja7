@@ -12,13 +12,13 @@ export const TUNE_DEFAULTS = {
   shop:   { heroSize: 226, heroX: 0, heroY: 0, awningY: 236, awningH: 58, headY: 8, picSize: 92, picX: 0, picY: 0, btnX: 0, btnY: 0, cardH: 176 },   // 카드 안 캐릭터·버튼 위치   // 상점: 사장님 크기·위치, 차양 위치·높이, '코스튬' 제목
   // 챕터 2~5 맵 (노드 5개 + 문). 처음 값은 길 모양에서 어림한 것 — 조정 모드 '맵2~5'에서 맞춘다
   map2:   { n1X: 203, n1Y: 1065, n2X: 261, n2Y: 853, n3X: 107, n3Y: 652, n4X: 263, n4Y: 472, n5X: 224, n5Y: 381, gateX: 172, gateY: 207, gateOpenX: 172, gateOpenY: 207, allClear: 0, gateLockX: 33, gateLockY: 34, gateLockSize: 40, prevX: 196, prevY: 1235,
-            cam1Y: 643, cam2Y: 133, cam3Y: 0, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
+            cam1Y: 643, cam2Y: 133, cam3Y: 133, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
   map3:   { n1X: 134, n1Y: 1123, n2X: 351, n2Y: 958, n3X: 192, n3Y: 857, n4X: 140, n4Y: 676, n5X: 342, n5Y: 461, gateX: 167, gateY: 215, gateOpenX: 167, gateOpenY: 215, allClear: 0, gateLockX: 33, gateLockY: 34, gateLockSize: 40, prevX: 196, prevY: 1235,
-            cam1Y: 643, cam2Y: 133, cam3Y: 0, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
+            cam1Y: 643, cam2Y: 133, cam3Y: 133, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
   map4:   { n1X: 180, n1Y: 1100, n2X: 351, n2Y: 924, n3X: 105, n3Y: 813, n4X: 252, n4Y: 629, n5X: 344, n5Y: 480, gateX: 165, gateY: 210, gateOpenX: 165, gateOpenY: 210, allClear: 0, gateLockX: 33, gateLockY: 34, gateLockSize: 40, prevX: 196, prevY: 1235,
-            cam1Y: 643, cam2Y: 133, cam3Y: 0, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
+            cam1Y: 643, cam2Y: 133, cam3Y: 133, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
   map5:   { n1X: 236, n1Y: 1128, n2X: 334, n2Y: 959, n3X: 108, n3Y: 893, n4X: 194, n4Y: 703, n5X: 334, n5Y: 470, gateX: 190, gateY: 185, gateOpenX: 190, gateOpenY: 185, allClear: 0, gateLockX: 33, gateLockY: 34, gateLockSize: 40, prevX: 196, prevY: 1235,
-            cam1Y: 643, cam2Y: 133, cam3Y: 0, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
+            cam1Y: 643, cam2Y: 133, cam3Y: 133, camView: 0, owlX: 300, owlY: 755, meDX: -62, meDY: 4, meSize: 74 },
   game:   { fruitSize: 137, gap: 64, stickLength: 0, tipCover: 9, x: 0, y: 0, pillsX: 16, pillsY: 38,
             backX: 14, backY: 2, backSize: 42, noteX: 0, noteY: 0, noteW: 300, noteH: 146, tilesX: 14, tilesY: 0, tileSize: 0, tileGap: 0, fruitScale: 72, tagX: 0, tagY: 0, tagScale: 100, dotsX: 30, dotsY: 4, dotSize: 30, dotGap: 12 },
   coat:   { fruitSize: 110, gap: 76, stickLength: 486, tipCover: 7, x: 0, y: 252, scale: 100, rotate: 0, potX: 30, potY: 480, potWidth: 330 },
