@@ -136,7 +136,7 @@ registerScreen('map', (root, params = {}) => {
       go(s.learn ? 'learn' : 'game', { stageId: s.id });
     });
     world.append(node);
-    if (state === 'open' && currentId === s.id) {                        // 내 캐릭터(사장님, 입은 옷)가 도전할 가게 옆에 서 있다
+    if (allClear ? si === stages.length - 1 : (state === 'open' && currentId === s.id)) {   // 내 캐릭터(사장님, 입은 옷)가 도전할 가게 옆에 서 있다 (다 깬 상태로 보기: 마지막 알 옆)
       const pm = tm.meDX != null ? tm : tune().map;                      // 내 캐릭터 위치·크기: 이 챕터 장면(맵2~5)에서, 없으면 맵 탭 값
       const me = el('div.me-node', { 'data-tx': 'meDX', 'data-ty': 'meDY', 'data-tmode': 'plain', 'data-toff': y, 'data-toffx': x, style: { left: (x + pm.meDX) + 'px', top: (y + pm.meDY) + 'px' } },
         img('char_boss', { style: { width: pm.meSize + 'px' } }));
