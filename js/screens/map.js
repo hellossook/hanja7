@@ -123,6 +123,8 @@ registerScreen('map', (root, params = {}) => {
   const scroll = el('div.map-scroll');
   const world = el('div.map-world.candy');
   world.style.setProperty('--map-bg', `url('${MAP + CH.map}')`); world.style.height = (MAP_H + PAD) + 'px';
+  // 맵 그림 위쪽 여백(PAD)은 그림의 맨 윗부분을 거울처럼 뒤집어 채운다 → 맨 위 화면에서 그림 끝 선이 안 보인다
+  world.append(el('div.map-sky', { style: { backgroundImage: `url('${MAP + CH.map}')`, height: PAD + 'px', backgroundSize: `393px ${MAP_H}px` } }));
   world.append(el('img', { src: MAP + CH.map, alt: '', class: 'bg', style: { position: 'absolute', left: 0, top: PAD + 'px', width: '393px', height: MAP_H + 'px' } }));
 
   let currentId = null;
