@@ -853,3 +853,5 @@ body.tuning .shop-head { cursor: ns-resize; }
 .shop-card { min-height: var(--card-h, 176px); }
 .shop-card .cpic { width: var(--pic, 92px); height: var(--pic, 92px); transform: translate(var(--pic-x, 0px), var(--pic-y, 0px)); }
 .shop-card .btn.small, .shop-card .wearing { transform: translate(var(--btn-x, 0px), var(--btn-y, 0px)); }
+.cnode.gate.gate-glow-node { cursor: pointer; }
+.cnode.gate.gate-glow-node .clabel { display: none; }

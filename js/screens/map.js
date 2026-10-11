@@ -155,9 +155,15 @@ registerScreen('map', (root, params = {}) => {
   };
   if (nextChapterFirst) {
     const open = chapterDone;
-    const gx = open ? (tm.gateOpenX ?? tm.gateX) : tm.gateX, gy = open ? (tm.gateOpenY ?? tm.gateY) : tm.gateY;   // 열린 문 라벨은 따로 옮길 수 있다
+    // 잠긴 문: 자물쇠 + 라벨 (gateX/Y). 열린 문: 노란 빛은 문 자리(gateX/Y)에, "n장으로 ▶" 라벨은 따로(gateOpenX/Y) — 둘을 각각 옮길 수 있다
+    const gx = open ? (tm.gateOpenX ?? tm.gateX) : tm.gateX, gy = open ? (tm.gateOpenY ?? tm.gateY) : tm.gateY;
     const gate = el('div.cnode.gate' + (open ? '.gate-open' : '.lock'), { 'data-tx': open ? 'gateOpenX' : 'gateX', 'data-ty': open ? 'gateOpenY' : 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: gx + 'px', top: (gy + PAD) + 'px' } },
-      open ? el('div.gate-glow') : gateLock(), el('div.clabel', { text: open ? `${chapter + 1}장으로 ▶` : `${chapter + 1}장` }));
+      open ? null : gateLock(), el('div.clabel', { text: open ? `${chapter + 1}장으로 ▶` : `${chapter + 1}장` }));
+    if (open) {
+      const glow = el('div.cnode.gate.gate-glow-node', { 'data-tx': 'gateX', 'data-ty': 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } }, el('div.gate-glow'));
+      glow.addEventListener('click', () => gate.click());
+      world.append(glow);
+    }
     if (!open && pending === lastId) fx.gateNode = gate;                 // 방금 챕터를 끝냈다 → 자물쇠가 열리는 연출
     if (open) [[-44, -30, '#FFE27A', 0], [50, -36, '#fff', 300], [-52, 30, '#fff', 600], [58, 24, '#FFE27A', 900], [8, -58, '#FFF3B0', 450]].forEach(([x, y, c, d]) =>
       gate.append(el('div.sparkle.gate-twinkle', { style: { left: (33 + x) + 'px', top: (33 + y) + 'px', animationDelay: d + 'ms' } }, icon.sparkle(16, c))));   // 열린 문 주위 반짝임
@@ -253,7 +259,7 @@ registerScreen('map', (root, params = {}) => {
       const g = fx.gateNode, l = g.querySelector('.gate-lock');
       if (l) { l.classList.add('gate-unlock'); setTimeout(() => l.remove(), 800); }
       g.classList.remove('lock'); g.classList.add('gate-open');
-      g.insertBefore(el('div.gate-glow'), g.firstChild);
+      world.append(el('div.cnode.gate.gate-glow-node', { style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } }, el('div.gate-glow')));
       g.querySelector('.clabel').textContent = `${chapter + 1}장으로 ▶`;
       sfx.unlock(); buzz(20);
     }, 1350);
