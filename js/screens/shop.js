@@ -20,6 +20,8 @@ registerScreen('shop', (root, params = {}) => {
   // ---- 아래: 흰 상자 안 코스튬 목록 ----
   const head = el('div.shop-head', { 'data-ty': 'headY', 'data-tmode': 'plain', style: { marginTop: T.headY + 'px' } }, el('span', { text: '코스튬' }));
   const grid = el('div.shop-grid');
+  grid.style.setProperty('--pic', T.picSize + 'px'); grid.style.setProperty('--pic-x', T.picX + 'px'); grid.style.setProperty('--pic-y', T.picY + 'px');
+  grid.style.setProperty('--btn-x', T.btnX + 'px'); grid.style.setProperty('--btn-y', T.btnY + 'px'); grid.style.setProperty('--card-h', T.cardH + 'px');
   const box = el('div.shop-box', { style: { paddingTop: (T.awningH / 2 + 14) + 'px' } }, el('div.shop-scroll', {}, head, grid));   // 흰 바탕. 제목도 목록과 함께 스크롤
   root.append(box);
 

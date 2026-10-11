@@ -849,3 +849,7 @@ body.tuning .shop-head { cursor: ns-resize; }
 .shop-scroll .shop-head { margin-top: 0; }
 .map-tiles .shop-btn { z-index: 2; }
 .shop-dialog .dbtn.two { gap: 6px; }
+/* 상점 카드 안 캐릭터·버튼 위치 (조정 모드 '상점') */
+.shop-card { min-height: var(--card-h, 176px); }
+.shop-card .cpic { width: var(--pic, 92px); height: var(--pic, 92px); transform: translate(var(--pic-x, 0px), var(--pic-y, 0px)); }
+.shop-card .btn.small, .shop-card .wearing { transform: translate(var(--btn-x, 0px), var(--btn-y, 0px)); }

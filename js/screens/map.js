@@ -91,6 +91,8 @@ registerScreen('map', (root, params = {}) => {
   const CH = CHAPTER_BY_ID[chapter];
   const tm = tune()[CH.scene];                                              // 이 챕터의 노드·문·카메라
   const stages = STAGES.filter(s => s.chapter === chapter);
+  const allClear = tuneMode && !!tm.allClear;                                // 조정 모드: 다 깬 상태로 보기 (문 열림·리본·트로피 위치 맞추기)
+  const stateOf = id => allClear ? 'clear' : nodeState(id);
   const lastId = stages[stages.length - 1].id;
   const nextChapterFirst = STAGE_ORDER[STAGE_ORDER.indexOf(lastId) + 1];   // 다음 챕터 첫 스테이지 (마지막 챕터면 없음)
 
@@ -105,14 +107,14 @@ registerScreen('map', (root, params = {}) => {
   stages.forEach((s, si) => {
     const k = si + 1;
     const x = tm['n' + k + 'X'], y0 = tm['n' + k + 'Y'], y = y0 + PAD;   // 노드 위치 (맵 그림 기준) — 조정 모드
-    const state = nodeState(s.id);
+    const state = stateOf(s.id);
     if (state === 'open' && !currentId) currentId = s.id;
     const ball = s.id === '8' ? 'straw' : BALLS[(chapter === 1 ? si - 1 : si) % BALLS.length];
     const node = el('div.cnode.' + state, { 'data-tx': 'n' + k + 'X', 'data-ty': 'n' + k + 'Y', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: x + 'px', top: y + 'px' } });
     node.append(mapImg(state === 'lock' ? 'node_lock' : 'node_' + ball, 'ball'));
     if (state === 'lock') node.append(mapImg('lock_' + BALL_LOCK[ball], 'lockico'));
     if (state === 'clear') {
-      const st = stageState(s.id).bestStars;
+      const st = allClear ? 3 : stageState(s.id).bestStars;
       const row = el('div.cstars' + (s.id === pending ? '.hid' : ''));
       for (let i = 0; i < 3; i++) row.append(img(i < st ? 'star_on' : 'star_off', { class: 'st' }));   // 노란 별 (icon_star_full_2)
       node.append(row);
@@ -144,7 +146,7 @@ registerScreen('map', (root, params = {}) => {
   });
 
   // 맨 위: 다음 장으로 가는 커튼 문 (마지막 챕터는 트로피 = 완주)
-  const chapterDone = stageState(lastId).cleared && pending !== lastId;
+  const chapterDone = allClear || (stageState(lastId).cleared && pending !== lastId);
   const gateLock = () => {
     const l = mapImg('lock_pink', 'lockico gate-lock');
     Object.assign(l.dataset, { tx: 'gateLockX', ty: 'gateLockY', tmode: 'plain' });
@@ -153,19 +155,20 @@ registerScreen('map', (root, params = {}) => {
   };
   if (nextChapterFirst) {
     const open = chapterDone;
-    const gate = el('div.cnode.gate' + (open ? '.gate-open' : '.lock'), { 'data-tx': 'gateX', 'data-ty': 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } },
+    const gx = open ? (tm.gateOpenX ?? tm.gateX) : tm.gateX, gy = open ? (tm.gateOpenY ?? tm.gateY) : tm.gateY;   // 열린 문 라벨은 따로 옮길 수 있다
+    const gate = el('div.cnode.gate' + (open ? '.gate-open' : '.lock'), { 'data-tx': open ? 'gateOpenX' : 'gateX', 'data-ty': open ? 'gateOpenY' : 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: gx + 'px', top: (gy + PAD) + 'px' } },
       open ? el('div.gate-glow') : gateLock(), el('div.clabel', { text: open ? `${chapter + 1}장으로 ▶` : `${chapter + 1}장` }));
     if (!open && pending === lastId) fx.gateNode = gate;                 // 방금 챕터를 끝냈다 → 자물쇠가 열리는 연출
     if (open) [[-44, -30, '#FFE27A', 0], [50, -36, '#fff', 300], [-52, 30, '#fff', 600], [58, 24, '#FFE27A', 900], [8, -58, '#FFF3B0', 450]].forEach(([x, y, c, d]) =>
       gate.append(el('div.sparkle.gate-twinkle', { style: { left: (33 + x) + 'px', top: (33 + y) + 'px', animationDelay: d + 'ms' } }, icon.sparkle(16, c))));   // 열린 문 주위 반짝임
     let going = false;
     gate.addEventListener('click', () => {
-      if (!stageState(lastId).cleared) { sfx.wrong(); toast(`${stageLabel(lastId)}을 먼저 깨요!`); return; }
+      if (!chapterDone) { sfx.wrong(); toast(`${stageLabel(lastId)}을 먼저 깨요!`); return; }
       if (going) return; going = true;
       gateTransition(gate, chapter + 1);
     });
     world.append(gate);
-  } else if (stageState(lastId).cleared) {                                 // 마지막 챕터 정상: 완주
+  } else if (chapterDone) {                                                 // 마지막 챕터 정상: 완주
     world.append(el('div.cnode.gate.trophy', { 'data-tx': 'gateX', 'data-ty': 'gateY', 'data-tmode': 'plain', 'data-toff': PAD, style: { left: tm.gateX + 'px', top: (tm.gateY + PAD) + 'px' } },
       el('div.cclear.done-all'), el('div.clabel', { text: '7급 완주!' })));
   }
@@ -178,7 +181,7 @@ registerScreen('map', (root, params = {}) => {
   }
 
   // 카메라: 1~3번은 아래, 4~5번은 가운데(챕터 1은 6번이 맨 위). 다 깼으면 맨 위(문)
-  const ci = currentId ? stages.findIndex(s => s.id === currentId) + 1 : (stageState(lastId).cleared ? stages.length + 1 : 1);   // 다 깼으면 맨 위(문), 아직 못 온 챕터면 아래
+  const ci = currentId ? stages.findIndex(s => s.id === currentId) + 1 : (chapterDone ? stages.length + 1 : 1);   // 다 깼으면 맨 위(문), 아직 못 온 챕터면 아래
   const autoView = chapter === 1 ? (ci <= 3 ? 1 : ci <= 5 ? 2 : 3) : (ci <= 3 ? 1 : 2);
   const view = tuneMode && tm.camView ? tm.camView : autoView;
 
