@@ -864,3 +864,6 @@ body.tuning .shop-head { cursor: ns-resize; }
 .master-dialog .muted { font-size: 14px; color: var(--ink2); }
 .master-ov .confetti { position: absolute; top: -20px; width: 10px; height: 16px; border-radius: 3px; opacity: 0.95; animation: confetti-fall linear forwards; z-index: 22; pointer-events: none; }
 @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(900px) rotate(540deg); opacity: 0.6; } }
+/* 별빛(3장): 떨어지면서 반짝인다 */
+.petals.twinkly .petal-in { animation: petal-twinkle ease-in-out infinite alternate; }
+@keyframes petal-twinkle { from { transform: translateX(-10px) rotate(-20deg) scale(0.7); opacity: 0.5; } to { transform: translateX(10px) rotate(25deg) scale(1.1); opacity: 1; } }

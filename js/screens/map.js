@@ -223,7 +223,7 @@ registerScreen('map', (root, params = {}) => {
     world.append(owl);
   }
   scroll.append(world);
-  root.append(scroll, petals(14));   // 벚꽃은 화면에 고정 (맵을 스크롤해도 계속 날린다)
+  root.append(scroll, petals(14, CH.fx));   // 장마다 다른 것이 날린다 (벚꽃·나뭇잎·별빛·노란 꽃잎·라일락). 화면에 고정
 
   const snd = menuBtn(icon.sound(progress.settings.sound, 44), '소리', () => {
     setSound(!progress.settings.sound); save(); sfx.tap();

@@ -8,13 +8,13 @@ export const CUSTOMERS = {
   ...Object.fromEntries(CHAR_STICKERS.map(c => [c.id, c.name])),
 };
 
-/** 챕터: 맵 그림과 조정 모드 장면. 노드 위치·카메라는 tuning.json 의 그 장면에 */
+/** 챕터: 맵 그림과 조정 모드 장면, fx = 맵에서 날리는 것(ui.js petals). 노드 위치·카메라는 tuning.json 의 그 장면에 */
 export const CHAPTERS = [
-  { id: 1, name: '하늘과 땅, 사계절', map: 'bg_map_candy.jpg', scene: 'map' },
-  { id: 2, name: '사람과 가족, 몸', map: 'bg_map_ch2.jpg', scene: 'map2' },
-  { id: 3, name: '숫자, 방향, 시간', map: 'bg_map_ch3.jpg', scene: 'map3' },
-  { id: 4, name: '배움과 말, 움직임', map: 'bg_map_ch4.jpg', scene: 'map4' },
-  { id: 5, name: '마을과 생활', map: 'bg_map_ch5.jpg', scene: 'map5' },
+  { id: 1, name: '하늘과 땅, 사계절', map: 'bg_map_candy.jpg', scene: 'map', fx: 'sakura' },
+  { id: 2, name: '사람과 가족, 몸', map: 'bg_map_ch2.jpg', scene: 'map2', fx: 'leaf' },
+  { id: 3, name: '숫자, 방향, 시간', map: 'bg_map_ch3.jpg', scene: 'map3', fx: 'star' },
+  { id: 4, name: '배움과 말, 움직임', map: 'bg_map_ch4.jpg', scene: 'map4', fx: 'yellow' },
+  { id: 5, name: '마을과 생활', map: 'bg_map_ch5.jpg', scene: 'map5', fx: 'lilac' },
 ];
 export const CHAPTER_BY_ID = Object.fromEntries(CHAPTERS.map(c => [c.id, c]));
 

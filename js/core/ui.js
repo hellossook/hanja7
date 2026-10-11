@@ -228,14 +228,26 @@ export function chatBubble(customer, size = 60) {
 }
 
 /** 벚꽃잎이 흩날리는 층 (누르기를 막지 않는다). count: 꽃잎 수 */
-export function petals(count = 14) {
-  const layer = el('div.petals');
-  const petal = c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-  const cols = ['#FFC7D9', '#FFB3CB', '#FFD6E3', '#FFA9C4'];
+/** 날리는 것들. kind: sakura(벚꽃, 기본) · leaf(초록 나뭇잎) · star(별빛) · yellow(노란 꽃잎) · lilac(보라 라일락 꽃잎) — 맵 장마다 다르다 */
+const PETAL_KINDS = {
+  sakura: { cols: ['#FFC7D9', '#FFB3CB', '#FFD6E3', '#FFA9C4'], size: [13, 24], dur: [7, 13],
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
+  leaf:   { cols: ['#8FD66B', '#A9E07A', '#6FC45A', '#B9EA8E'], size: [14, 26], dur: [8, 14],
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M3 17 C3 8 9 2 18 2 C18 11 12 17 3 17 Z" fill="${c}"/><path d="M4 16 L16 4" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
+  star:   { cols: ['#FFF3A8', '#FFE27A', '#FFFFFF', '#CFE9FF'], size: [10, 20], dur: [10, 18], twinkle: true,
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0 L12.4 7.6 L20 10 L12.4 12.4 L10 20 L7.6 12.4 L0 10 L7.6 7.6 Z" fill="${c}"/></svg>` },
+  yellow: { cols: ['#FFE27A', '#FFD24A', '#FFF0A8', '#FFC93C'], size: [12, 22], dur: [7, 13],
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
+  lilac:  { cols: ['#C9A6F2', '#B48BEB', '#E0CBFA', '#A77CE6'], size: [12, 22], dur: [8, 14],
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><g fill="${c}"><ellipse cx="10" cy="4.5" rx="3.2" ry="4.3"/><ellipse cx="15.5" cy="10" rx="4.3" ry="3.2"/><ellipse cx="10" cy="15.5" rx="3.2" ry="4.3"/><ellipse cx="4.5" cy="10" rx="4.3" ry="3.2"/></g><circle cx="10" cy="10" r="2" fill="#FFF3B0"/></svg>` },
+};
+export function petals(count = 14, kind = 'sakura') {
+  const K = PETAL_KINDS[kind] || PETAL_KINDS.sakura;
+  const layer = el('div.petals' + (K.twinkle ? '.twinkly' : ''));
   for (let i = 0; i < count; i++) {
-    const s = 13 + Math.round(Math.random() * 11), dur = 7 + Math.random() * 6;
+    const s = K.size[0] + Math.round(Math.random() * (K.size[1] - K.size[0])), dur = K.dur[0] + Math.random() * (K.dur[1] - K.dur[0]);
     const p = el('div.petal', { style: { left: (Math.random() * 100) + '%', width: s + 'px', height: s + 'px', animationDuration: dur + 's', animationDelay: (-Math.random() * dur) + 's' } },
-      el('div.petal-in', { style: { animationDuration: (2 + Math.random() * 2) + 's' }, html: petal(cols[i % cols.length]) }));
+      el('div.petal-in', { style: { animationDuration: (2 + Math.random() * 2) + 's' }, html: K.svg(K.cols[i % K.cols.length]) }));
     layer.append(p);
   }
   return layer;
