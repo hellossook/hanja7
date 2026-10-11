@@ -137,7 +137,7 @@ registerScreen('map', (root, params = {}) => {
     });
     world.append(node);
     if (state === 'open' && currentId === s.id) {                        // 내 캐릭터(사장님, 입은 옷)가 도전할 가게 옆에 서 있다
-      const pm = tune().map;
+      const pm = tm.meDX != null ? tm : tune().map;                      // 내 캐릭터 위치·크기: 이 챕터 장면(맵2~5)에서, 없으면 맵 탭 값
       const me = el('div.me-node', { 'data-tx': 'meDX', 'data-ty': 'meDY', 'data-tmode': 'plain', 'data-toff': y, 'data-toffx': x, style: { left: (x + pm.meDX) + 'px', top: (y + pm.meDY) + 'px' } },
         img('char_boss', { style: { width: pm.meSize + 'px' } }));
       me.addEventListener('click', () => { sfx.tap(); go('shop'); });
