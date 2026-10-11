@@ -234,12 +234,12 @@ const PETAL_KINDS = {
     svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
   leaf:   { cols: ['#8FD66B', '#A9E07A', '#6FC45A', '#B9EA8E'], size: [14, 26], dur: [8, 14],
     svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M3 17 C3 8 9 2 18 2 C18 11 12 17 3 17 Z" fill="${c}"/><path d="M4 16 L16 4" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
-  star:   { cols: ['#FFF3A8', '#FFE27A', '#FFFFFF', '#CFE9FF'], size: [10, 20], dur: [10, 18], twinkle: true,
+  star:   { cols: ['#FFF3A8', '#FFE27A', '#FFFFFF', '#CFE9FF'], size: [10, 20], dur: [7, 13],   // 별도 벚꽃과 똑같이 흔들리며 떨어진다
     svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0 L12.4 7.6 L20 10 L12.4 12.4 L10 20 L7.6 12.4 L0 10 L7.6 7.6 Z" fill="${c}"/></svg>` },
   yellow: { cols: ['#FFE27A', '#FFD24A', '#FFF0A8', '#FFC93C'], size: [12, 22], dur: [7, 13],
     svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
-  lilac:  { cols: ['#C9A6F2', '#B48BEB', '#E0CBFA', '#A77CE6'], size: [12, 22], dur: [8, 14],
-    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><g fill="${c}"><ellipse cx="10" cy="4.5" rx="3.2" ry="4.3"/><ellipse cx="15.5" cy="10" rx="4.3" ry="3.2"/><ellipse cx="10" cy="15.5" rx="3.2" ry="4.3"/><ellipse cx="4.5" cy="10" rx="4.3" ry="3.2"/></g><circle cx="10" cy="10" r="2" fill="#FFF3B0"/></svg>` },
+  lilac:  { cols: ['#C9A6F2', '#B48BEB', '#E0CBFA', '#A77CE6'], size: [13, 24], dur: [7, 13],   // 벚꽃과 같은 꽃잎 모양, 보라색
+    svg: c => `<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 1 C14 3 18 8 16 13 C14.5 17 11 19 10 17.5 C9 19 5.5 17 4 13 C2 8 6 3 10 1 Z" fill="${c}"/><path d="M10 4 L10 15" stroke="rgba(255,255,255,0.65)" stroke-width="1.2" stroke-linecap="round"/></svg>` },
 };
 export function petals(count = 14, kind = 'sakura') {
   const K = PETAL_KINDS[kind] || PETAL_KINDS.sakura;
