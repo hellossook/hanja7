@@ -20,6 +20,7 @@ function fresh() {
     costume: 'default',            // 입고 있는 코스튬
     pendingClear: null,            // 방금 처음 깬 스테이지 (맵에서 도장 연출 한 번)
     masterShown: false,            // 7급 완주 축하 팝업을 보여 줬는지
+    custStuck: [],                 // 손님 스티커를 붙인 스테이지 (스테이지마다 한 번)
   };
 }
 

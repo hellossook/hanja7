@@ -396,7 +396,11 @@ registerScreen('game', (root, params) => {
       await wait(260);
       list.append(el('div.chat-item', {}, faceBadge(others[i], lastSale ? 52 : 58), el('div.msg', { text: pick(CHAT_LINES[others[i]] || CHAT_LINES.generic) })));
     }
-    await stickCustomerSticker(L, custEl);
+    // 손님 스티커는 스테이지마다 딱 한 번 (처음 판매 때)
+    const stickKey = isReview ? 'review' : stage.id;
+    progress.custStuck = progress.custStuck || [];
+    if (!progress.custStuck.includes(stickKey)) { progress.custStuck.push(stickKey); await stickCustomerSticker(L, custEl); }
+    else await wait(300);
     S.last = { fruits: S.onSkewer.slice(), coat: S.coat };
     S.made.push(S.last);                                        // 이 스테이지에서 만든 탕후루 (결과 화면에 전부)
     const last = S.qi >= questions.length;
