@@ -81,17 +81,17 @@
     "scrollW": 6
   },
   "shop": {
-    "heroSize": 234,
+    "heroSize": 243,
     "heroX": 0,
     "heroY": -21,
     "awningY": 270,
     "awningH": 58,
     "headY": 24,
-    "picSize": 92,
+    "picSize": 101,
     "picX": 0,
-    "picY": 0,
+    "picY": 19,
     "btnX": 0,
-    "btnY": 0,
+    "btnY": 27,
     "cardH": 176
   },
   "map2": {
